@@ -260,3 +260,6 @@ For questions or suggestions, please open an issue in the repository.
 
 **Note**: This is a comprehensive data science project demonstrating various analysis techniques and machine learning approaches for email spam detection.
 
+---
+*Enhanced with improved spam classification ML pipeline including NLP preprocessing and comprehensive evaluation metrics*
+
