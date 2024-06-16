@@ -433,3 +433,6 @@ This project is designed for educational purposes to demonstrate:
 ---
 
 **Note:** This project assumes you have legal access to the fraud detection dataset. Ensure compliance with all applicable licenses and terms of use before proceeding.
+
+---
+*Enhanced with predictive fraud detection system including anomaly detection and supervised ML models*
