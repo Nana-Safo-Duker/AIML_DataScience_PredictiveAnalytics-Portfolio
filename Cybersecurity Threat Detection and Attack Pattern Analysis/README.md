@@ -316,5 +316,8 @@ For questions or suggestions, please open an issue in the repository.
 
 **Version**: 1.0.0
 
+---
+*Enhanced with integrated advanced threat detection models and cyberattack pattern analytics*
+
 
 
