@@ -1,0 +1,195 @@
+---
+title: "Statistical Analysis - Iris Dataset"
+author: "Data Science Project"
+date: "2024"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
+                      fig.width = 12, fig.height = 8)
+```
+
+## Introduction
+
+This notebook provides comprehensive statistical analysis including:
+- Descriptive Statistics
+- Inferential Statistics
+- Exploratory Statistical Analysis
+
+## Load Libraries
+
+```{r libraries}
+library(dplyr)
+library(tidyr)
+library(psych)
+library(car)
+library(ggplot2)
+library(gridExtra)
+library(corrplot)
+library(ggcorrplot)
+```
+
+## Load Data
+
+```{r load_data}
+data_path <- file.path("..", "..", "data", "Iris.csv")
+iris_data <- read.csv(data_path)
+features <- c("sepal.length", "sepal.width", "petal.length", "petal.width")
+```
+
+## Descriptive Statistics
+
+```{r descriptive_stats}
+# Overall descriptive statistics
+describe(iris_data[, features])
+```
+
+```{r descriptive_by_variety}
+# Descriptive statistics by variety
+for (variety in unique(iris_data$variety)) {
+  cat("\n", variety, ":\n")
+  print(describe(iris_data[iris_data$variety == variety, features]))
+}
+```
+
+## Normality Tests
+
+```{r normality_tests}
+# Shapiro-Wilk test for normality
+normality_results <- data.frame()
+
+for (feature in features) {
+  for (variety in unique(iris_data$variety)) {
+    data <- iris_data[iris_data$variety == variety, feature]
+    test_result <- shapiro.test(data)
+    normality_results <- rbind(normality_results, data.frame(
+      Feature = feature,
+      Variety = variety,
+      Statistic = test_result$statistic,
+      P.value = test_result$p.value,
+      Normal = ifelse(test_result$p.value > 0.05, "Yes", "No")
+    ))
+  }
+}
+
+print(normality_results)
+```
+
+## Inferential Statistics - ANOVA
+
+```{r anova}
+# One-way ANOVA for each feature
+cat("ONE-WAY ANOVA TESTS\n")
+cat("H0: All groups have the same mean\n")
+cat("H1: At least one group has a different mean\n\n")
+
+anova_results <- data.frame()
+
+for (feature in features) {
+  model <- aov(get(feature) ~ variety, data = iris_data)
+  anova_summary <- summary(model)
+  f_stat <- anova_summary[[1]]$`F value`[1]
+  p_value <- anova_summary[[1]]$`Pr(>F)`[1]
+  
+  anova_results <- rbind(anova_results, data.frame(
+    Feature = feature,
+    F.statistic = f_stat,
+    P.value = p_value,
+    Significant = ifelse(p_value < 0.05, "Yes", "No")
+  ))
+}
+
+print(anova_results)
+```
+
+## Pairwise t-tests
+
+```{r pairwise_ttests}
+# Pairwise t-tests
+varieties <- unique(iris_data$variety)
+pairs <- combn(varieties, 2, simplify = FALSE)
+
+ttest_results <- data.frame()
+
+for (feature in features) {
+  for (pair in pairs) {
+    group1 <- iris_data[iris_data$variety == pair[1], feature]
+    group2 <- iris_data[iris_data$variety == pair[2], feature]
+    
+    # Check for equal variance
+    levene_test <- leveneTest(get(feature) ~ variety, 
+                              data = iris_data[iris_data$variety %in% pair, ])
+    equal_var <- levene_test$`Pr(>F)`[1] > 0.05
+    
+    ttest <- t.test(group1, group2, var.equal = equal_var)
+    
+    ttest_results <- rbind(ttest_results, data.frame(
+      Feature = feature,
+      Group1 = pair[1],
+      Group2 = pair[2],
+      T.statistic = ttest$statistic,
+      P.value = ttest$p.value,
+      Significant = ifelse(ttest$p.value < 0.05, "Yes", "No")
+    ))
+  }
+}
+
+print(ttest_results)
+```
+
+## Correlation Analysis
+
+```{r correlation}
+# Pearson correlation
+cor_matrix <- cor(iris_data[, features])
+print("Pearson Correlation Matrix:")
+print(round(cor_matrix, 4))
+
+# Visualize correlation matrix
+ggcorrplot(cor_matrix, 
+           method = "circle",
+           type = "lower",
+           lab = TRUE,
+           title = "Pearson Correlation Matrix",
+           colors = c("#6D9EC1", "white", "#E46726"))
+```
+
+## Confidence Intervals
+
+```{r confidence_intervals}
+# Calculate 95% confidence intervals for means
+ci_results <- data.frame()
+
+for (feature in features) {
+  for (variety in unique(iris_data$variety)) {
+    data <- iris_data[iris_data$variety == variety, feature]
+    ci <- t.test(data)$conf.int
+    mean_val <- mean(data)
+    
+    ci_results <- rbind(ci_results, data.frame(
+      Feature = feature,
+      Variety = variety,
+      Mean = mean_val,
+      CI.Lower = ci[1],
+      CI.Upper = ci[2],
+      CI.Range = ci[2] - ci[1]
+    ))
+  }
+}
+
+print(round(ci_results, 4))
+```
+
+## Summary
+
+The statistical analysis reveals:
+1. All features show significant differences between varieties (ANOVA p < 0.05)
+2. Strong correlations exist between petal measurements
+3. Setosa is clearly distinguishable from other varieties
+4. Versicolor and Virginica show some overlap but are still distinguishable
+

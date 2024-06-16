@@ -1,0 +1,207 @@
+---
+title: "Machine Learning Analysis - Iris Dataset"
+author: "Data Science Project"
+date: "2024"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
+                      fig.width = 12, fig.height = 8)
+```
+
+## Introduction
+
+This notebook implements various machine learning algorithms for classification of iris species.
+
+## Load Libraries
+
+```{r libraries}
+library(dplyr)
+library(caret)
+library(randomForest)
+library(e1071)
+library(rpart)
+library(nnet)
+library(ggplot2)
+library(gridExtra)
+```
+
+## Load and Prepare Data
+
+```{r load_data}
+data_path <- file.path("..", "..", "data", "Iris.csv")
+iris_data <- read.csv(data_path)
+
+# Prepare data
+features <- c("sepal.length", "sepal.width", "petal.length", "petal.width")
+X <- iris_data[, features]
+y <- iris_data$variety
+
+# Set seed for reproducibility
+set.seed(42)
+
+# Split data
+train_index <- createDataPartition(y, p = 0.8, list = FALSE)
+X_train <- X[train_index, ]
+X_test <- X[-train_index, ]
+y_train <- y[train_index]
+y_test <- y[-train_index]
+
+cat("Training set size:", nrow(X_train), "\n")
+cat("Test set size:", nrow(X_test), "\n")
+```
+
+## Define Training Control
+
+```{r train_control}
+# Define training control for cross-validation
+train_control <- trainControl(method = "cv", number = 5, 
+                              summaryFunction = defaultSummary)
+```
+
+## Train Models
+
+### Logistic Regression
+
+```{r logistic_regression}
+# Logistic Regression
+model_lr <- train(x = X_train, y = y_train,
+                  method = "multinom",
+                  trControl = train_control,
+                  trace = FALSE)
+
+pred_lr <- predict(model_lr, X_test)
+cm_lr <- confusionMatrix(pred_lr, y_test)
+print(cm_lr)
+```
+
+### Support Vector Machine
+
+```{r svm}
+# Support Vector Machine
+model_svm <- train(x = X_train, y = y_train,
+                   method = "svmRadial",
+                   trControl = train_control,
+                   preProcess = c("center", "scale"))
+
+pred_svm <- predict(model_svm, X_test)
+cm_svm <- confusionMatrix(pred_svm, y_test)
+print(cm_svm)
+```
+
+### Decision Tree
+
+```{r decision_tree}
+# Decision Tree
+model_dt <- train(x = X_train, y = y_train,
+                  method = "rpart",
+                  trControl = train_control)
+
+pred_dt <- predict(model_dt, X_test)
+cm_dt <- confusionMatrix(pred_dt, y_test)
+print(cm_dt)
+```
+
+### Random Forest
+
+```{r random_forest}
+# Random Forest
+model_rf <- train(x = X_train, y = y_train,
+                  method = "rf",
+                  trControl = train_control,
+                  ntree = 100)
+
+pred_rf <- predict(model_rf, X_test)
+cm_rf <- confusionMatrix(pred_rf, y_test)
+print(cm_rf)
+```
+
+### k-Nearest Neighbors
+
+```{r knn}
+# k-Nearest Neighbors
+model_knn <- train(x = X_train, y = y_train,
+                   method = "knn",
+                   trControl = train_control,
+                   preProcess = c("center", "scale"),
+                   tuneLength = 10)
+
+pred_knn <- predict(model_knn, X_test)
+cm_knn <- confusionMatrix(pred_knn, y_test)
+print(cm_knn)
+```
+
+### Naive Bayes
+
+```{r naive_bayes}
+# Naive Bayes
+model_nb <- train(x = X_train, y = y_train,
+                  method = "naive_bayes",
+                  trControl = train_control)
+
+pred_nb <- predict(model_nb, X_test)
+cm_nb <- confusionMatrix(pred_nb, y_test)
+print(cm_nb)
+```
+
+## Model Comparison
+
+```{r model_comparison}
+# Collect results
+results <- data.frame(
+  Model = c("Logistic Regression", "SVM", "Decision Tree", 
+            "Random Forest", "KNN", "Naive Bayes"),
+  Accuracy = c(cm_lr$overall[["Accuracy"]],
+               cm_svm$overall[["Accuracy"]],
+               cm_dt$overall[["Accuracy"]],
+               cm_rf$overall[["Accuracy"]],
+               cm_knn$overall[["Accuracy"]],
+               cm_nb$overall[["Accuracy"]])
+)
+
+cat("MODEL COMPARISON\n")
+cat("=", rep("=", 78), "\n", sep = "")
+print(round(results, 4))
+
+# Visualize results
+ggplot(results, aes(x = reorder(Model, Accuracy), y = Accuracy)) +
+  geom_bar(stat = "identity", fill = "steelblue", alpha = 0.7) +
+  coord_flip() +
+  labs(title = "Model Comparison - Accuracy",
+       x = "Model", y = "Accuracy") +
+  theme_minimal() +
+  geom_text(aes(label = round(Accuracy, 4)), 
+            hjust = -0.1, size = 3.5)
+```
+
+## Best Model - Detailed Evaluation
+
+```{r best_model}
+# Find best model
+best_model_name <- results$Model[which.max(results$Accuracy)]
+cat("Best Model:", best_model_name, "\n")
+cat("Accuracy:", max(results$Accuracy), "\n")
+```
+
+## Feature Importance (Random Forest)
+
+```{r feature_importance}
+# Feature importance from Random Forest
+if (exists("model_rf")) {
+  importance <- varImp(model_rf)
+  print(importance)
+  
+  # Plot feature importance
+  plot(importance, main = "Feature Importance - Random Forest")
+}
+```
+
+## Summary
+
+Machine learning analysis shows that multiple algorithms achieve high accuracy on the Iris dataset, with Random Forest and SVM typically performing best.
+
