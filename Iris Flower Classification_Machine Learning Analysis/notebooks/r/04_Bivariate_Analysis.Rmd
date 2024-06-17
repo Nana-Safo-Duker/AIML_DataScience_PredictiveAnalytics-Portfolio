@@ -1,0 +1,108 @@
+---
+title: "Bivariate Analysis - Iris Dataset"
+author: "Data Science Project"
+date: "2024"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
+                      fig.width = 12, fig.height = 8)
+```
+
+## Introduction
+
+This notebook performs bivariate analysis between pairs of features.
+
+## Load Libraries
+
+```{r libraries}
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+library(corrplot)
+library(ggcorrplot)
+```
+
+## Load Data
+
+```{r load_data}
+data_path <- file.path("..", "..", "data", "Iris.csv")
+iris_data <- read.csv(data_path)
+features <- c("sepal.length", "sepal.width", "petal.length", "petal.width")
+```
+
+## Scatter Plots
+
+```{r scatterplots}
+# Create all pairwise scatter plots
+pairs_data <- expand.grid(f1 = features, f2 = features, stringsAsFactors = FALSE)
+pairs_data <- pairs_data[pairs_data$f1 != pairs_data$f2, ]
+pairs_data <- pairs_data[!duplicated(t(apply(pairs_data, 1, sort))), ]
+
+plots <- list()
+for (i in 1:nrow(pairs_data)) {
+  f1 <- pairs_data$f1[i]
+  f2 <- pairs_data$f2[i]
+  
+  p <- ggplot(iris_data, aes_string(x = f1, y = f2, color = "variety")) +
+    geom_point(alpha = 0.6, size = 2) +
+    labs(title = paste(f1, "vs", f2),
+         x = f1, y = f2) +
+    theme_minimal() +
+    theme(legend.position = "bottom")
+  plots[[paste(f1, f2, sep = "_")]] <- p
+}
+
+do.call(grid.arrange, c(plots, ncol = 3))
+```
+
+## Correlation Analysis
+
+```{r correlation}
+# Pearson correlation
+cat("PEARSON CORRELATION COEFFICIENTS\n")
+cat("=", rep("=", 78), "\n", sep = "")
+
+for (i in 1:(length(features) - 1)) {
+  for (j in (i + 1):length(features)) {
+    f1 <- features[i]
+    f2 <- features[j]
+    cor_test <- cor.test(iris_data[[f1]], iris_data[[f2]])
+    cat(f1, "vs", f2, ": r =", round(cor_test$estimate, 4), 
+        ", p-value =", format(cor_test$p.value, scientific = TRUE), "\n")
+  }
+}
+```
+
+## Correlation Heatmap
+
+```{r correlation_heatmap}
+# Correlation matrix
+cor_matrix <- cor(iris_data[, features])
+ggcorrplot(cor_matrix, 
+           method = "circle",
+           type = "lower",
+           lab = TRUE,
+           title = "Correlation Matrix",
+           colors = c("#6D9EC1", "white", "#E46726"))
+```
+
+## Pair Plot
+
+```{r pairplot}
+# Create a comprehensive pair plot
+pairs(iris_data[, features], 
+      col = as.numeric(iris_data$variety),
+      main = "Pair Plot of Iris Dataset",
+      pch = 19)
+```
+
+## Summary
+
+Bivariate analysis reveals relationships and correlations between pairs of features.
+
