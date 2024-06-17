@@ -200,10 +200,40 @@ def evaluate_models(y_test, predictions, predictions_proba, output_dir):
             'Accuracy': accuracy
         })
     
-    comparison_df = pd.DataFrame(comparison)
+    comparison_df = pd.DataFrame(comparison).sort_values('AUC-ROC', ascending=False)
     print("\nModel Comparison:")
     print("="*80)
-    print(comparison_df.sort_values('AUC-ROC', ascending=False).to_string(index=False))
+    print(comparison_df.to_string(index=False))
+
+    # Model comparison bar chart
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    axes[0].barh(comparison_df['Model'], comparison_df['AUC-ROC'], color='steelblue')
+    axes[0].set_xlabel('AUC-ROC')
+    axes[0].set_title('Model Comparison: AUC-ROC')
+    axes[0].grid(True, alpha=0.3, axis='x')
+    axes[1].barh(comparison_df['Model'], comparison_df['Accuracy'], color='seagreen')
+    axes[1].set_xlabel('Accuracy')
+    axes[1].set_title('Model Comparison: Accuracy')
+    axes[1].grid(True, alpha=0.3, axis='x')
+    plt.tight_layout()
+    plt.savefig(f'{output_dir}/model_comparison.png', dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"\nModel comparison saved to {output_dir}/model_comparison.png")
+
+    # Confusion matrix for best model by AUC
+    best_name = comparison_df.iloc[0]['Model']
+    cm = confusion_matrix(y_test, predictions[best_name])
+    plt.figure(figsize=(7, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+                xticklabels=['Legitimate', 'Fraud'],
+                yticklabels=['Legitimate', 'Fraud'])
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.title(f'Confusion Matrix: {best_name}')
+    plt.tight_layout()
+    plt.savefig(f'{output_dir}/confusion_matrix.png', dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"Confusion matrix saved to {output_dir}/confusion_matrix.png")
     
     return comparison_df
 

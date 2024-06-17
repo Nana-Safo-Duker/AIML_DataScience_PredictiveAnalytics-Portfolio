@@ -438,3 +438,27 @@ This project is designed for educational purposes to demonstrate:
 *Enhanced with predictive fraud detection system including anomaly detection and supervised ML models*
 
 **Last Updated**: June 2024
+
+## Visualizations
+
+Showcase figures are stored in `docs/images/`:
+
+### Class distribution
+
+![Class distribution](docs/images/class_distribution.png)
+
+### Transaction amount by fraud
+
+![Transaction amount by fraud](docs/images/amount_by_fraud.png)
+
+### Correlation heatmap
+
+![Correlation heatmap](docs/images/correlation_heatmap.png)
+
+### Model comparison
+
+![Model comparison](docs/images/model_comparison.png)
+
+### ROC curves
+
+![ROC curves](docs/images/roc_curves.png)

@@ -16,9 +16,15 @@ import os
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-# Set style
+# Set style (seaborn-v0_8 may be unavailable on older matplotlib)
 sns.set_style("whitegrid")
-plt.style.use('seaborn-v0_8')
+try:
+    plt.style.use('seaborn-v0_8')
+except OSError:
+    try:
+        plt.style.use('seaborn')
+    except OSError:
+        plt.style.use('ggplot')
 warnings.filterwarnings('ignore')
 
 # Set display options
@@ -142,7 +148,11 @@ def analyze_transaction_amount(df, output_dir):
     
     # Box plot by fraud status
     fraud_data = [df[df['isFraud']==0]['TransactionAmt'], df[df['isFraud']==1]['TransactionAmt']]
-    axes[1, 0].boxplot(fraud_data, labels=['Legitimate', 'Fraud'])
+    try:
+        axes[1, 0].boxplot(fraud_data, tick_labels=['Legitimate', 'Fraud'])
+    except TypeError:
+        # Older matplotlib used labels=
+        axes[1, 0].boxplot(fraud_data, labels=['Legitimate', 'Fraud'])
     axes[1, 0].set_ylabel('Transaction Amount', fontsize=12)
     axes[1, 0].set_title('Transaction Amount by Fraud Status', fontsize=14, fontweight='bold')
     axes[1, 0].set_yscale('log')

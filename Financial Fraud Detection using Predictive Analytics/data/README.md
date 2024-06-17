@@ -4,27 +4,23 @@ This directory contains the fraud detection dataset.
 
 ## Files
 
-- `fraud_data.csv` - Main fraud detection dataset
+- `fraud_data.csv` — Compact **synthetic educational sample** (IEEE-CIS–style columns) so EDA and ML scripts can run without the original full dataset.
 
-## Dataset Information
+## Note on provenance
 
-### Target Variable
-- `isFraud` - Binary target variable (0 = legitimate transaction, 1 = fraudulent transaction)
+The original `fraud_data.csv` was **not committed** to this repository (size/license). The included file is randomly generated with a fixed RNG seed: imbalanced `isFraud`, `TransactionAmt`, `TransactionDT`, card/address fields, `C1–C5`, `D1–D5`, `V1–V20`, and categoricals (`ProductCD`, `DeviceType`, `M1–M3`, etc.). It is for educational demos only—not real transactions.
 
-### Features
-The dataset contains various features including:
-- Transaction identifiers and metadata
-- Card information
-- Address information
-- Email domains
-- Device information
-- Transaction features (C1-C14, D1-D15, M1-M9, V1-V339)
-- Identity features (id_01-id_38)
+## Target Variable
 
-### Data Usage
-Please ensure you have the appropriate permissions and comply with the original dataset's license before using this data.
+- `isFraud` — Binary target (0 = legitimate, 1 = fraudulent)
 
-### Data Preprocessing
-Refer to the EDA notebooks for data preprocessing steps and handling of missing values.
+## Features (sample schema)
 
-**Last Updated**: June 2024
+- Transaction: `TransactionAmt`, `TransactionDT`, `ProductCD`
+- Card / address: `card1`–`card5`, `card4`, `addr1`, `addr2`, `dist1`, `dist2`
+- Counts / deltas / engineered: `C1`–`C5`, `D1`–`D5`, `V1`–`V20`
+- Match / device: `M1`–`M3`, `DeviceType`
+
+## Data Usage
+
+Use for educational and research practice only. Do not treat rows as real financial activity.

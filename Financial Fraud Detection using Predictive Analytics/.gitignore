@@ -60,6 +60,7 @@ env/
 data/raw/
 data/processed/
 !data/README.md
+!data/fraud_data.csv
 
 # Models
 *.pkl
@@ -102,6 +103,9 @@ Thumbs.db
 # Documentation
 docs/_build/
 *.pdf
+!docs/images/
+!docs/images/**
+!docs/images/*.png
 
 # Temporary files
 *.tmp
