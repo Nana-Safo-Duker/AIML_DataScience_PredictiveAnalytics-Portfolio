@@ -1,0 +1,267 @@
+---
+title: "Exploratory Data Analysis (EDA) - Iris Dataset"
+author: "Data Science Project"
+date: "2024"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
+                      fig.width = 12, fig.height = 8)
+```
+
+## Introduction
+
+This notebook provides a comprehensive exploratory data analysis of the Iris dataset.
+
+### Objectives
+1. Load and understand the dataset
+2. Perform data quality checks
+3. Generate descriptive statistics
+4. Create visualizations
+5. Identify patterns and relationships
+6. Detect outliers and anomalies
+
+### Dataset Information
+The Iris dataset contains measurements of 150 iris flowers from three different species:
+- Setosa
+- Versicolor
+- Virginica
+
+Features:
+- Sepal length (cm)
+- Sepal width (cm)
+- Petal length (cm)
+- Petal width (cm)
+- Variety (target variable)
+
+## Load Libraries
+
+```{r libraries}
+# Data manipulation
+library(dplyr)
+library(tidyr)
+library(readr)
+
+# Visualization
+library(ggplot2)
+library(gridExtra)
+library(corrplot)
+library(ggcorrplot)
+library(RColorBrewer)
+
+# Statistical analysis
+library(psych)
+library(DescTools)
+
+# Set theme
+theme_set(theme_minimal() + theme(plot.title = element_text(hjust = 0.5, size = 14, face = "bold")))
+```
+
+## 1. Data Loading
+
+```{r load_data}
+# Load the dataset
+data_path <- file.path("..", "..", "data", "Iris.csv")
+iris_data <- read_csv(data_path)
+
+# Display basic information
+cat("Dataset loaded successfully!\n")
+cat("Dataset dimensions:", dim(iris_data), "\n")
+cat("Number of rows:", nrow(iris_data), "\n")
+cat("Number of columns:", ncol(iris_data), "\n")
+```
+
+## 2. Data Overview
+
+```{r data_overview}
+# Display first few rows
+head(iris_data, 10)
+```
+
+```{r data_tail}
+# Display last few rows
+tail(iris_data, 10)
+```
+
+```{r data_info}
+# Dataset information
+str(iris_data)
+summary(iris_data)
+```
+
+```{r missing_values}
+# Check for missing values
+cat("Missing Values:\n")
+missing_values <- sapply(iris_data, function(x) sum(is.na(x)))
+print(missing_values)
+cat("\nTotal missing values:", sum(missing_values), "\n")
+```
+
+```{r duplicates}
+# Check for duplicates
+cat("Duplicate Rows:", sum(duplicated(iris_data)), "\n")
+```
+
+## 3. Descriptive Statistics
+
+```{r descriptive_stats}
+# Basic descriptive statistics
+describe(iris_data[, 1:4])
+```
+
+```{r target_distribution}
+# Target variable distribution
+cat("Target Variable Distribution:\n")
+table(iris_data$variety)
+cat("\nProportions:\n")
+prop.table(table(iris_data$variety))
+```
+
+## 4. Visualizations
+
+### 4.1 Pair Plot
+
+```{r pair_plot}
+# Create pair plot using base R
+pairs(iris_data[, 1:4], 
+      col = as.numeric(iris_data$variety),
+      main = "Pair Plot of Iris Dataset",
+      pch = 19)
+```
+
+### 4.2 Distribution of Features by Species
+
+```{r distribution_plots}
+# Distribution of each feature by species
+features <- c("sepal.length", "sepal.width", "petal.length", "petal.width")
+
+plots <- list()
+for (feature in features) {
+  p <- ggplot(iris_data, aes_string(x = feature, fill = "variety")) +
+    geom_histogram(alpha = 0.6, bins = 20, position = "identity") +
+    labs(title = paste("Distribution of", feature),
+         x = feature, y = "Frequency") +
+    theme(legend.position = "bottom")
+  plots[[feature]] <- p
+}
+
+do.call(grid.arrange, c(plots, ncol = 2))
+```
+
+### 4.3 Box Plots
+
+```{r box_plots}
+# Box plots for each feature by variety
+plots <- list()
+for (feature in features) {
+  p <- ggplot(iris_data, aes_string(x = "variety", y = feature, fill = "variety")) +
+    geom_boxplot(alpha = 0.7) +
+    labs(title = paste("Box Plot of", feature, "by Variety"),
+         x = "Variety", y = feature) +
+    theme(legend.position = "none")
+  plots[[feature]] <- p
+}
+
+do.call(grid.arrange, c(plots, ncol = 2))
+```
+
+### 4.4 Violin Plots
+
+```{r violin_plots}
+# Violin plots for better distribution visualization
+plots <- list()
+for (feature in features) {
+  p <- ggplot(iris_data, aes_string(x = "variety", y = feature, fill = "variety")) +
+    geom_violin(alpha = 0.7) +
+    geom_boxplot(width = 0.1, fill = "white", alpha = 0.5) +
+    labs(title = paste("Violin Plot of", feature, "by Variety"),
+         x = "Variety", y = feature) +
+    theme(legend.position = "none")
+  plots[[feature]] <- p
+}
+
+do.call(grid.arrange, c(plots, ncol = 2))
+```
+
+### 4.5 Correlation Matrix
+
+```{r correlation_matrix}
+# Correlation matrix
+cor_matrix <- cor(iris_data[, 1:4])
+ggcorrplot(cor_matrix, 
+           method = "circle",
+           type = "lower",
+           lab = TRUE,
+           title = "Correlation Matrix of Numerical Features",
+           colors = c("#6D9EC1", "white", "#E46726"))
+```
+
+## 5. Outlier Detection
+
+```{r outlier_detection}
+# Detect outliers using IQR method
+detect_outliers_iqr <- function(data, column) {
+  Q1 <- quantile(data[[column]], 0.25)
+  Q3 <- quantile(data[[column]], 0.75)
+  IQR <- Q3 - Q1
+  lower_bound <- Q1 - 1.5 * IQR
+  upper_bound <- Q3 + 1.5 * IQR
+  outliers <- data[data[[column]] < lower_bound | data[[column]] > upper_bound, ]
+  return(list(outliers = outliers, lower = lower_bound, upper = upper_bound))
+}
+
+cat("Outlier Detection (IQR Method):\n")
+for (feature in features) {
+  result <- detect_outliers_iqr(iris_data, feature)
+  cat("\n", feature, ":\n")
+  cat("  Lower bound:", result$lower, "\n")
+  cat("  Upper bound:", result$upper, "\n")
+  cat("  Number of outliers:", nrow(result$outliers), "\n")
+}
+```
+
+## 6. Data Quality Assessment
+
+```{r data_quality}
+# Data quality summary
+cat("DATA QUALITY SUMMARY\n")
+cat("Total rows:", nrow(iris_data), "\n")
+cat("Total columns:", ncol(iris_data), "\n")
+cat("Missing values:", sum(is.na(iris_data)), "\n")
+cat("Duplicate rows:", sum(duplicated(iris_data)), "\n")
+cat("\nUnique values per column:\n")
+for (col in names(iris_data)) {
+  cat("  ", col, ":", n_distinct(iris_data[[col]]), "\n")
+}
+```
+
+## 7. Summary Statistics by Variety
+
+```{r stats_by_variety}
+# Summary statistics by variety
+for (variety in unique(iris_data$variety)) {
+  cat("\n", variety, ":\n")
+  print(describe(iris_data[iris_data$variety == variety, 1:4]))
+}
+```
+
+## 8. Key Insights and Conclusions
+
+### Key Findings:
+1. Dataset is clean with no missing values
+2. Balanced dataset with 50 samples per class
+3. All features are numerical and continuous
+4. Strong correlations exist between petal measurements
+5. Setosa class appears to be linearly separable from other classes
+
+### Next Steps:
+- Perform statistical analysis
+- Conduct univariate, bivariate, and multivariate analysis
+- Build machine learning models
+
+
