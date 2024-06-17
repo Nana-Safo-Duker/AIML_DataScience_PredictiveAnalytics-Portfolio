@@ -1,0 +1,106 @@
+---
+title: "Multivariate Analysis - Iris Dataset"
+author: "Data Science Project"
+date: "2024"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
+                      fig.width = 12, fig.height = 8)
+```
+
+## Introduction
+
+This notebook performs multivariate analysis using dimensionality reduction techniques.
+
+## Load Libraries
+
+```{r libraries}
+library(dplyr)
+library(ggplot2)
+library(FactoMineR)
+library(factoextra)
+```
+
+## Load Data
+
+```{r load_data}
+data_path <- file.path("..", "..", "data", "Iris.csv")
+iris_data <- read.csv(data_path)
+features <- c("sepal.length", "sepal.width", "petal.length", "petal.width")
+X <- iris_data[, features]
+y <- iris_data$variety
+```
+
+## Principal Component Analysis (PCA)
+
+```{r pca}
+# Perform PCA
+pca_result <- PCA(X, graph = FALSE, scale.unit = TRUE)
+
+# Summary of PCA
+print(pca_result)
+
+# Explained variance
+cat("\nExplained Variance:\n")
+print(pca_result$eig)
+
+# Total variance explained by first 2 components
+cat("\nTotal variance explained by first 2 components:",
+    sum(pca_result$eig[1:2, 2]), "%\n")
+```
+
+## PCA Visualization
+
+```{r pca_plot}
+# Plot PCA results
+fviz_pca_ind(pca_result,
+             col.ind = y,
+             palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+             addEllipses = TRUE,
+             legend.title = "Variety",
+             title = "PCA: First Two Principal Components")
+```
+
+## Scree Plot
+
+```{r scree_plot}
+# Scree plot
+fviz_eig(pca_result, addlabels = TRUE, ylim = c(0, 80),
+         title = "Scree Plot - Explained Variance")
+```
+
+## Feature Contribution to Principal Components
+
+```{r contribution}
+# Contribution of variables to principal components
+fviz_pca_var(pca_result,
+             col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             title = "Contribution of Variables to Principal Components")
+```
+
+## Biplot
+
+```{r biplot}
+# Biplot
+fviz_pca_biplot(pca_result,
+                col.ind = y,
+                palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+                addEllipses = TRUE,
+                label = "var",
+                col.var = "black",
+                repel = TRUE,
+                legend.title = "Variety",
+                title = "PCA Biplot")
+```
+
+## Summary
+
+Multivariate analysis through PCA reveals that the first two principal components explain most of the variance and clearly separate the three iris varieties.
+
