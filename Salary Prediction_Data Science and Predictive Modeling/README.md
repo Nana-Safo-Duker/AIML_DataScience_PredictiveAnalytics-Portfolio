@@ -243,3 +243,27 @@ For questions or suggestions, please open an issue in the repository.
 *Enhanced with salary prediction modeling using regression techniques and comprehensive feature analysis*
 
 **Last Updated**: June 2024
+
+## Visualizations
+
+Showcase figures are stored in `docs/images/`:
+
+### Polynomial regression curve
+
+![Polynomial regression curve](docs/images/polynomial_regression_curve.png)
+
+### Residuals (polynomial)
+
+![Residuals (polynomial)](docs/images/residuals_polynomial.png)
+
+### Model comparison
+
+![Model comparison](docs/images/model_comparison_salary.png)
+
+### Salary by position
+
+![Salary by position](docs/images/salary_by_position.png)
+
+### Level vs salary trend
+
+![Level vs salary trend](docs/images/level_vs_salary_trend.png)

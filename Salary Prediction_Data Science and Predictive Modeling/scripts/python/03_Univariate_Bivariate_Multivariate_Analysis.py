@@ -14,8 +14,22 @@ from pathlib import Path
 import sys
 
 # Add project root to path
-project_root = Path(__file__).resolve().parent.parent.parent
+SCRIPT_DIR = Path(__file__).resolve().parent
+project_root = SCRIPT_DIR.parent.parent
 sys.path.append(str(project_root))
+
+
+def resolve_path(*parts):
+    """Resolve path via project root and cwd candidates."""
+    candidates = [
+        project_root.joinpath(*parts),
+        Path.cwd().joinpath(*parts),
+        Path.cwd().parent.parent.joinpath(*parts),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate.resolve()
+    return project_root.joinpath(*parts)
 
 # Set style
 sns.set_style("whitegrid")
@@ -24,7 +38,7 @@ warnings.filterwarnings('ignore')
 
 def load_data():
     """Load the dataset."""
-    data_path = project_root / "data" / "raw" / "Position_Salaries.csv"
+    data_path = resolve_path("data", "raw", "Position_Salaries.csv")
     df = pd.read_csv(data_path)
     return df
 
@@ -131,6 +145,9 @@ def bivariate_analysis(df, output_dir):
     """
     axes[1, 0].text(0.1, 0.5, stats_text, fontsize=11, verticalalignment='center',
                     family='monospace', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+    # Unused subplot slots from the 2x3 grid
+    axes[1, 1].axis('off')
+    axes[1, 2].axis('off')
     
     plt.tight_layout()
     plt.savefig(output_dir / 'bivariate_analysis.png', dpi=300, bbox_inches='tight')

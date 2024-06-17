@@ -1,0 +1,11 @@
+Position,Level,Salary,Salary_Category,Level_Group,Log_Salary
+Business Analyst,1,45000,Low,Junior,10.714417768752456
+Junior Consultant,2,50000,Low,Junior,10.819778284410283
+Senior Consultant,3,60000,Low,Junior,11.002099841204238
+Manager,4,80000,Low,Mid,11.289781913656018
+Country Manager,5,110000,Medium,Mid,11.608235644774552
+Region Manager,6,150000,Medium,Mid,11.918390573078392
+Partner,7,200000,High,Senior,12.206072645530174
+Senior Partner,8,300000,High,Senior,12.611537753638338
+C-level,9,500000,Very High,Senior,13.122363377404328
+CEO,10,1000000,Very High,Senior,13.815510557964274

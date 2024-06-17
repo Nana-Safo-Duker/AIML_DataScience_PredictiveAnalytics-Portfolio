@@ -12,8 +12,22 @@ from pathlib import Path
 import sys
 
 # Add project root to path
-project_root = Path(__file__).resolve().parent.parent.parent
+SCRIPT_DIR = Path(__file__).resolve().parent
+project_root = SCRIPT_DIR.parent.parent
 sys.path.append(str(project_root))
+
+
+def resolve_path(*parts):
+    """Resolve path via project root and cwd candidates."""
+    candidates = [
+        project_root.joinpath(*parts),
+        Path.cwd().joinpath(*parts),
+        Path.cwd().parent.parent.joinpath(*parts),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate.resolve()
+    return project_root.joinpath(*parts)
 
 # Set style and warnings
 sns.set_style("whitegrid")
@@ -22,7 +36,7 @@ warnings.filterwarnings('ignore')
 
 def load_data():
     """Load the dataset from the raw data directory."""
-    data_path = project_root / "data" / "raw" / "Position_Salaries.csv"
+    data_path = resolve_path("data", "raw", "Position_Salaries.csv")
     df = pd.read_csv(data_path)
     return df
 
