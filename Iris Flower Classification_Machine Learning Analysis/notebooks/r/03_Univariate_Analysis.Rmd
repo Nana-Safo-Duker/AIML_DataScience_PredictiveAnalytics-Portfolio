@@ -1,0 +1,115 @@
+---
+title: "Univariate Analysis - Iris Dataset"
+author: "Data Science Project"
+date: "2024"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
+                      fig.width = 12, fig.height = 8)
+```
+
+## Introduction
+
+This notebook performs univariate analysis on each feature of the Iris dataset.
+
+## Load Libraries
+
+```{r libraries}
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+library(psych)
+```
+
+## Load Data
+
+```{r load_data}
+data_path <- file.path("..", "..", "data", "Iris.csv")
+iris_data <- read.csv(data_path)
+features <- c("sepal.length", "sepal.width", "petal.length", "petal.width")
+```
+
+## Descriptive Statistics
+
+```{r descriptive}
+# Univariate statistics for each feature
+for (feature in features) {
+  cat("\n", "=", rep("=", 78), "\n", sep = "")
+  cat("UNIVARIATE ANALYSIS: ", feature, "\n", sep = "")
+  cat("=", rep("=", 78), "\n", sep = "")
+  cat("Mean:", mean(iris_data[[feature]]), "\n")
+  cat("Median:", median(iris_data[[feature]]), "\n")
+  cat("Std Dev:", sd(iris_data[[feature]]), "\n")
+  cat("Variance:", var(iris_data[[feature]]), "\n")
+  cat("Min:", min(iris_data[[feature]]), "\n")
+  cat("Max:", max(iris_data[[feature]]), "\n")
+  cat("Range:", max(iris_data[[feature]]) - min(iris_data[[feature]]), "\n")
+  cat("IQR:", IQR(iris_data[[feature]]), "\n")
+}
+```
+
+## Distribution Plots
+
+```{r distributions}
+# Histograms for each feature
+plots <- list()
+for (feature in features) {
+  p <- ggplot(iris_data, aes_string(x = feature)) +
+    geom_histogram(bins = 30, fill = "steelblue", alpha = 0.7, color = "black") +
+    geom_vline(xintercept = mean(iris_data[[feature]]), 
+               color = "red", linestyle = "dashed", size = 1) +
+    geom_vline(xintercept = median(iris_data[[feature]]), 
+               color = "green", linestyle = "dashed", size = 1) +
+    labs(title = paste("Distribution of", feature),
+         x = feature, y = "Frequency") +
+    theme_minimal()
+  plots[[feature]] <- p
+}
+
+do.call(grid.arrange, c(plots, ncol = 2))
+```
+
+## Box Plots
+
+```{r boxplots}
+# Box plots for each feature
+plots <- list()
+for (feature in features) {
+  p <- ggplot(iris_data, aes_string(y = feature)) +
+    geom_boxplot(fill = "steelblue", alpha = 0.7) +
+    labs(title = feature, y = "Value") +
+    theme_minimal() +
+    coord_flip()
+  plots[[feature]] <- p
+}
+
+do.call(grid.arrange, c(plots, ncol = 4))
+```
+
+## Q-Q Plots
+
+```{r qqplots}
+# Q-Q plots for normality assessment
+plots <- list()
+for (feature in features) {
+  p <- ggplot(iris_data, aes_string(sample = feature)) +
+    stat_qq() +
+    stat_qq_line() +
+    labs(title = paste("Q-Q Plot:", feature)) +
+    theme_minimal()
+  plots[[feature]] <- p
+}
+
+do.call(grid.arrange, c(plots, ncol = 2))
+```
+
+## Summary
+
+Univariate analysis reveals the distribution and characteristics of each feature individually.
+
