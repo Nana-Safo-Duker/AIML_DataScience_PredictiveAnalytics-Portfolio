@@ -188,7 +188,7 @@ emails-spam/
 ---
 
 **Project Status**: ✅ Complete
-**Last Updated**: 2024
+**Last Updated**: June 2024
 **License**: MIT License
 
 
