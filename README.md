@@ -145,3 +145,4 @@ This repository curates ten end-to-end analytics projects that span marketing, c
 
 Curated with ❤️ to accelerate real-world applied analytics projects. Happy exploring!
 
+**Last Updated**: June 2024
