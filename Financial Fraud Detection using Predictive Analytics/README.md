@@ -436,3 +436,5 @@ This project is designed for educational purposes to demonstrate:
 
 ---
 *Enhanced with predictive fraud detection system including anomaly detection and supervised ML models*
+
+**Last Updated**: June 2024
