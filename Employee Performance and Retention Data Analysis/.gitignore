@@ -41,6 +41,7 @@ ENV/
 # Data files (keep structure but ignore large files)
 data/raw/*.csv
 data/processed/*.csv
+!data/raw/employees.csv
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 
@@ -100,6 +101,9 @@ dmypy.json
 *.svg
 !README.md
 !LICENSE
+!docs/images/
+!docs/images/**
+!docs/images/*.png
 
 # Keep directory structure
 !data/raw/.gitkeep

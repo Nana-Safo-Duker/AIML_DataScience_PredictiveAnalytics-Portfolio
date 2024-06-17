@@ -29,8 +29,12 @@ print("="*80)
 print("STATISTICAL ANALYSIS - EMPLOYEE DATASET")
 print("="*80)
 
-# Load cleaned dataset
-df = pd.read_csv('data/processed/employees_cleaned.csv')
+# Load cleaned dataset (absolute path works from any cwd)
+df = pd.read_csv(os.path.join(project_root, 'data', 'processed', 'employees_cleaned.csv'))
+# Normalize Senior_Management after CSV round-trip
+df['Senior_Management'] = df['Senior_Management'].map(
+    {True: True, False: False, 'True': True, 'False': False, 'true': True, 'false': False}
+).fillna(False).astype(bool)
 
 # =============================================================================
 # 1. DESCRIPTIVE STATISTICS

@@ -10,19 +10,19 @@ library(e1071)
 library(corrplot)
 library(ggplot2)
 
-# Set working directory to project root
-# This script should be run from the project root directory
-# Or navigate to project root if running from scripts/r directory
-if (basename(getwd()) == "r" && basename(dirname(getwd())) == "scripts") {
-  setwd(dirname(dirname(getwd())))
-} else if (basename(getwd()) == "scripts") {
-  setwd(dirname(getwd()))
+# Multi-candidate path resolution (project root or scripts/r/)
+project_root <- NULL
+for (cand in c(".", file.path("..", ".."), "..")) {
+  if (file.exists(file.path(cand, "data", "processed", "employees_cleaned.csv"))) {
+    project_root <- normalizePath(cand, winslash = "/", mustWork = FALSE)
+    break
+  }
 }
+if (is.null(project_root)) {
+  stop(paste("Cannot find data/processed/employees_cleaned.csv. Run EDA first. CWD:", getwd()))
+}
+setwd(project_root)
 cat("Working directory:", getwd(), "\n")
-# Verify we're in the right place
-if (!file.exists("data/processed/employees_cleaned.csv")) {
-  stop("Please run EDA script first to create cleaned dataset, or ensure data/processed/employees_cleaned.csv exists")
-}
 
 # Create results directories
 dir.create("results/models", recursive = TRUE, showWarnings = FALSE)

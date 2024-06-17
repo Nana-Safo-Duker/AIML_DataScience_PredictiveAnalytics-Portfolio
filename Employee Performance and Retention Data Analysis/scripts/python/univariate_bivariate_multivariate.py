@@ -28,8 +28,11 @@ print("="*80)
 print("UNIVARIATE, BIVARIATE, AND MULTIVARIATE ANALYSIS - EMPLOYEE DATASET")
 print("="*80)
 
-# Load cleaned dataset
-df = pd.read_csv('data/processed/employees_cleaned.csv')
+# Load cleaned dataset (absolute path works from any cwd)
+df = pd.read_csv(os.path.join(project_root, 'data', 'processed', 'employees_cleaned.csv'))
+df['Senior_Management'] = df['Senior_Management'].map(
+    {True: True, False: False, 'True': True, 'False': False, 'true': True, 'false': False}
+).fillna(False).astype(bool)
 
 numerical_cols = ['Salary', 'Bonus_pct', 'Years_of_Service']
 categorical_cols = ['Gender', 'Senior_Management', 'Team']

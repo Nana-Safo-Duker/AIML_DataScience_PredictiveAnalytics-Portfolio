@@ -403,3 +403,27 @@ For questions or suggestions, please open an issue in the repository.
 *Enhanced with comprehensive workforce performance analytics and retention risk modeling*
 
 **Last Updated**: June 2024
+
+## Visualizations
+
+Showcase figures are stored in `docs/images/`:
+
+### Salary distribution
+
+![Salary distribution](docs/images/salary_distribution.png)
+
+### Headcount by team
+
+![Headcount by team](docs/images/headcount_by_team.png)
+
+### Salary by senior management
+
+![Salary by senior management](docs/images/salary_by_senior_mgmt.png)
+
+### Model comparison
+
+![Model comparison](docs/images/model_comparison.png)
+
+### ROC curves
+
+![ROC curves](docs/images/roc_curves.png)
