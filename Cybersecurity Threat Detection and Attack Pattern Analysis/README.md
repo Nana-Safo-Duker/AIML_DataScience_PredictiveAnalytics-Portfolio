@@ -319,5 +319,26 @@ For questions or suggestions, please open an issue in the repository.
 ---
 *Enhanced with integrated advanced threat detection models and cyberattack pattern analytics*
 
+## Visualizations
 
+Showcase figures are stored in `docs/images/`:
 
+### Attack categories
+
+![Attack categories](docs/images/attack_categories.png)
+
+### Protocol distribution
+
+![Protocol distribution](docs/images/protocol_distribution.png)
+
+### Model comparison
+
+![Model comparison](docs/images/model_comparison.png)
+
+### Feature importance
+
+![Feature importance](docs/images/feature_importance.png)
+
+### Destination port distribution
+
+![Destination port distribution](docs/images/destination_port_dist.png)

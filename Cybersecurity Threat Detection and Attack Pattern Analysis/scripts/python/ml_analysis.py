@@ -1,6 +1,9 @@
 """
 Machine Learning Analysis for Cybersecurity Attacks Dataset
 """
+import os
+from pathlib import Path
+
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
@@ -15,6 +18,13 @@ import xgboost as xgb
 import lightgbm as lgb
 import warnings
 warnings.filterwarnings('ignore')
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+DATA_PATH = PROJECT_ROOT / 'data' / 'Cybersecurity_attacks.csv'
+RESULTS_DIR = PROJECT_ROOT / 'results'
+VIZ_DIR = PROJECT_ROOT / 'visualizations'
+
 
 def load_and_prepare_data(file_path):
     """Load and prepare data for ML"""
@@ -152,8 +162,22 @@ def train_models(X, y):
 
 def main():
     """Main function"""
-    print("Loading data...")
-    df = load_and_prepare_data('../../data/Cybersecurity_attacks.csv')
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    VIZ_DIR.mkdir(parents=True, exist_ok=True)
+
+    if not DATA_PATH.exists():
+        raise FileNotFoundError(f"Dataset not found: {DATA_PATH}")
+
+    print(f"Loading data from: {DATA_PATH}")
+    df = load_and_prepare_data(DATA_PATH)
+
+    # Optional subsample for faster runs (unset = full dataset; scientific default unchanged)
+    sample_n = os.environ.get('CYBER_SAMPLE_N')
+    if sample_n:
+        sample_n = int(sample_n)
+        if sample_n < len(df):
+            df = df.sample(n=sample_n, random_state=42).reset_index(drop=True)
+            print(f"Using CYBER_SAMPLE_N={sample_n} subsample for this run")
     
     print("Preparing features...")
     X, y, features, le_category = prepare_features(df)
@@ -186,6 +210,3 @@ def main():
 
 if __name__ == "__main__":
     results, best_model, scaler, features, le_category = main()
-
-
-

@@ -3,6 +3,11 @@ Script to verify project structure and files
 """
 import os
 import json
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+os.chdir(PROJECT_ROOT)
+
 
 def check_file_exists(filepath):
     """Check if file exists"""
@@ -65,7 +70,12 @@ required_directories = [
 
 print("=" * 60)
 print("PROJECT VERIFICATION")
+print(f"Project root: {PROJECT_ROOT}")
 print("=" * 60)
+
+# Ensure optional dirs exist so structure checks are actionable
+for dir_path in ("visualizations", "results", "docs", "docs/images"):
+    Path(dir_path).mkdir(parents=True, exist_ok=True)
 
 # Check directories
 print("\n1. Checking directories...")
@@ -114,6 +124,3 @@ print("  - Files: OK" if all_files_ok else "  - Files: FAILED")
 print("  - Notebooks: OK" if all_notebooks_ok else "  - Notebooks: FAILED")
 
 print("\n" + "=" * 60)
-
-
-

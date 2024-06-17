@@ -3,6 +3,10 @@ Script to create comprehensive analysis notebooks for Cybersecurity Attacks data
 """
 import json
 import os
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+os.chdir(PROJECT_ROOT)
 
 def create_cell(cell_type, source, metadata=None):
     """Create a notebook cell"""

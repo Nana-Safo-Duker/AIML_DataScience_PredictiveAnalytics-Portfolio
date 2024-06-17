@@ -7,9 +7,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
-import missingno as msno
 from datetime import datetime
 import os
+from pathlib import Path
 
 warnings.filterwarnings('ignore')
 
@@ -21,6 +21,14 @@ plt.rcParams['font.size'] = 10
 # Set pandas display options
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', 100)
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+DATA_PATH = PROJECT_ROOT / 'data' / 'Cybersecurity_attacks.csv'
+CLEANED_PATH = PROJECT_ROOT / 'data' / 'cybersecurity_attacks_cleaned.csv'
+VIZ_DIR = PROJECT_ROOT / 'visualizations'
+RESULTS_DIR = PROJECT_ROOT / 'results'
+
 
 def load_data(file_path):
     """Load the cybersecurity attacks dataset"""
@@ -91,9 +99,16 @@ def parse_time_column(df):
 
 def main():
     """Main function to run EDA"""
+    VIZ_DIR.mkdir(parents=True, exist_ok=True)
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+    if not DATA_PATH.exists():
+        raise FileNotFoundError(f"Dataset not found: {DATA_PATH}")
+
     # Load data
-    file_path = '../../data/Cybersecurity_attacks.csv'
-    df = load_data(file_path)
+    print(f"Loading data from: {DATA_PATH}")
+    df = load_data(DATA_PATH)
     
     # Analyze missing values
     missing_df = analyze_missing_values(df)
@@ -111,12 +126,8 @@ def main():
     print(f"Unique Protocols: {df['Protocol'].nunique() if 'Protocol' in df.columns else 0}")
     
     # Save cleaned dataset
-    output_path = '../../data/cybersecurity_attacks_cleaned.csv'
-    df.to_csv(output_path, index=False)
-    print(f"\nCleaned dataset saved to {output_path}")
+    df.to_csv(CLEANED_PATH, index=False)
+    print(f"\nCleaned dataset saved to {CLEANED_PATH}")
 
 if __name__ == "__main__":
     main()
-
-
-

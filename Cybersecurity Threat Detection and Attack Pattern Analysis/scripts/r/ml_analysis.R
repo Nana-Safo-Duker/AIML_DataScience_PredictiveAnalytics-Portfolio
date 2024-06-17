@@ -11,8 +11,27 @@ library(rpart.plot)
 library(xgboost)
 library(glmnet)
 
+# Multi-candidate path resolution (project root or scripts/r/)
+data_path <- file.path("data", "Cybersecurity_attacks.csv")
+results_dir <- "results"
+if (!file.exists(data_path)) {
+  data_path <- file.path("..", "..", "data", "Cybersecurity_attacks.csv")
+  results_dir <- file.path("..", "..", "results")
+}
+if (!file.exists(data_path)) {
+  data_path <- file.path("..", "data", "Cybersecurity_attacks.csv")
+  results_dir <- file.path("..", "results")
+}
+if (!file.exists(data_path)) {
+  stop(paste("Cannot find Cybersecurity_attacks.csv. Current working directory:", getwd()))
+}
+if (!dir.exists(results_dir)) {
+  dir.create(results_dir, recursive = TRUE, showWarnings = FALSE)
+}
+
 # Load dataset
-df <- read.csv("data/Cybersecurity_attacks.csv", stringsAsFactors = FALSE)
+df <- read.csv(data_path, stringsAsFactors = FALSE)
+cat("Dataset loaded from:", data_path, "\n")
 colnames(df) <- trimws(colnames(df))
 
 if ("." %in% colnames(df)) {

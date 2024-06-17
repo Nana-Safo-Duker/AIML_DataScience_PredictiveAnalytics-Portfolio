@@ -3,6 +3,11 @@ Final comprehensive verification of all requirements
 """
 import json
 import os
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+os.chdir(PROJECT_ROOT)
+
 
 def check_notebook_cells(notebook_path):
     """Check notebook cell count and types"""
@@ -30,6 +35,7 @@ def check_ml_algorithms(notebook_path):
 
 print("=" * 80)
 print("FINAL COMPREHENSIVE VERIFICATION REPORT")
+print(f"Project root: {PROJECT_ROOT}")
 print("=" * 80)
 
 # Check all notebooks
@@ -125,4 +131,3 @@ print("✓ All notebooks and scripts are in place")
 print("✓ Documentation is comprehensive")
 print("✓ Dataset license is respected and documented")
 print("=" * 80)
-

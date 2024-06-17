@@ -8,8 +8,21 @@ library(corrplot)
 library(car)
 library(psych)
 
+# Multi-candidate path resolution (project root or scripts/r/)
+data_path <- file.path("data", "Cybersecurity_attacks.csv")
+if (!file.exists(data_path)) {
+  data_path <- file.path("..", "..", "data", "Cybersecurity_attacks.csv")
+}
+if (!file.exists(data_path)) {
+  data_path <- file.path("..", "data", "Cybersecurity_attacks.csv")
+}
+if (!file.exists(data_path)) {
+  stop(paste("Cannot find Cybersecurity_attacks.csv. Current working directory:", getwd()))
+}
+
 # Load dataset
-df <- read.csv("data/Cybersecurity_attacks.csv", stringsAsFactors = FALSE)
+df <- read.csv(data_path, stringsAsFactors = FALSE)
+cat("Dataset loaded from:", data_path, "\n")
 colnames(df) <- trimws(colnames(df))
 
 if ("." %in% colnames(df)) {

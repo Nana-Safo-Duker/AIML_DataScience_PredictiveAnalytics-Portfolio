@@ -56,10 +56,13 @@ results/*.model
 *.model
 *.joblib
 
-# Visualizations (optional - remove if you want to track)
-# visualizations/*.png
-# visualizations/*.jpg
-# visualizations/*.pdf
+# Visualizations (runtime dumps; keep showcase PNGs under docs/images/)
+visualizations/*.png
+visualizations/*.jpg
+visualizations/*.pdf
+!visualizations/.gitkeep
+!docs/images/
+!docs/images/**
 
 # OS
 .DS_Store

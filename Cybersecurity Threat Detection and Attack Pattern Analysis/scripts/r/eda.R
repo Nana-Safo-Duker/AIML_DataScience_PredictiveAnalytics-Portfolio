@@ -10,11 +10,27 @@ library(corrplot)
 library(VIM)
 library(naniar)
 
-# Set working directory (adjust as needed)
-setwd("../../")
+# Multi-candidate path resolution (project root or scripts/r/)
+data_path <- file.path("data", "Cybersecurity_attacks.csv")
+viz_dir <- "visualizations"
+if (!file.exists(data_path)) {
+  data_path <- file.path("..", "..", "data", "Cybersecurity_attacks.csv")
+  viz_dir <- file.path("..", "..", "visualizations")
+}
+if (!file.exists(data_path)) {
+  data_path <- file.path("..", "data", "Cybersecurity_attacks.csv")
+  viz_dir <- file.path("..", "visualizations")
+}
+if (!file.exists(data_path)) {
+  stop(paste("Cannot find Cybersecurity_attacks.csv. Current working directory:", getwd()))
+}
+if (!dir.exists(viz_dir)) {
+  dir.create(viz_dir, recursive = TRUE, showWarnings = FALSE)
+}
 
 # Load dataset
-df <- read.csv("data/Cybersecurity_attacks.csv", stringsAsFactors = FALSE)
+df <- read.csv(data_path, stringsAsFactors = FALSE)
+cat("Dataset loaded from:", data_path, "\n")
 
 # Clean column names
 colnames(df) <- trimws(colnames(df))
@@ -77,7 +93,7 @@ if ("Attack.category" %in% colnames(df)) {
   print(sort(attack_category_counts, decreasing = TRUE))
   
   # Visualization
-  png("visualizations/attack_category_distribution_R.png", width = 1200, height = 800, res = 300)
+  png(file.path(viz_dir, "attack_category_distribution_R.png"), width = 1200, height = 800, res = 300)
   barplot(sort(attack_category_counts, decreasing = TRUE)[1:10], 
           main = "Top 10 Attack Categories",
           xlab = "Attack Category",

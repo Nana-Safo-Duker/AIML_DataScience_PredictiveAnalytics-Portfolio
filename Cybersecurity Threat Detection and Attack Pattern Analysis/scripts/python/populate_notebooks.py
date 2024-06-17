@@ -3,6 +3,10 @@ Script to populate all analysis notebooks with comprehensive content
 """
 import json
 import os
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+os.chdir(PROJECT_ROOT)
 
 def create_markdown_cell(source):
     return {

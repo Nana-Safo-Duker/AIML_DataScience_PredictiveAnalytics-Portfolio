@@ -1,6 +1,9 @@
 """
 Univariate, Bivariate, and Multivariate Analysis for Cybersecurity Attacks Dataset
 """
+import os
+from pathlib import Path
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,6 +11,12 @@ import seaborn as sns
 from scipy import stats
 import warnings
 warnings.filterwarnings('ignore')
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+DATA_PATH = PROJECT_ROOT / 'data' / 'Cybersecurity_attacks.csv'
+VIZ_DIR = PROJECT_ROOT / 'visualizations'
+
 
 def load_and_prepare_data(file_path):
     """Load and prepare data"""
@@ -42,12 +51,15 @@ def load_and_prepare_data(file_path):
     
     return df
 
-def univariate_analysis(df, numerical_cols, categorical_cols, output_dir='../../visualizations/'):
+def univariate_analysis(df, numerical_cols, categorical_cols, output_dir):
     """Perform univariate analysis"""
     print("=" * 60)
     print("UNIVARIATE ANALYSIS")
     print("=" * 60)
     
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
     # Numerical variables
     for col in numerical_cols:
         if col not in df.columns:
@@ -85,19 +97,22 @@ def univariate_analysis(df, numerical_cols, categorical_cols, output_dir='../../
         
         plt.suptitle(f'Univariate Analysis: {col}', fontsize=16, fontweight='bold', y=1.02)
         plt.tight_layout()
-        plt.savefig(f'{output_dir}univariate_{col.replace(" ", "_")}.png', 
+        plt.savefig(output_dir / f'univariate_{col.replace(" ", "_")}.png', 
                     dpi=300, bbox_inches='tight')
         plt.close()
         
         print(f"\n{col} Statistics:")
         print(df[col].describe())
 
-def bivariate_analysis(df, output_dir='../../visualizations/'):
+def bivariate_analysis(df, output_dir):
     """Perform bivariate analysis"""
     print("\n" + "=" * 60)
     print("BIVARIATE ANALYSIS")
     print("=" * 60)
     
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
     # Scatter plot: Source Port vs Destination Port
     if 'Source Port' in df.columns and 'Destination Port' in df.columns:
         sample_df = df.sample(min(10000, len(df)), random_state=42)
@@ -109,7 +124,7 @@ def bivariate_analysis(df, output_dir='../../visualizations/'):
         plt.title('Source Port vs Destination Port', fontsize=16, fontweight='bold')
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
-        plt.savefig(f'{output_dir}bivariate_source_dest_port.png', 
+        plt.savefig(output_dir / 'bivariate_source_dest_port.png', 
                     dpi=300, bbox_inches='tight')
         plt.close()
         
@@ -128,16 +143,19 @@ def bivariate_analysis(df, output_dir='../../visualizations/'):
         plt.ylabel('Destination Port', fontsize=12)
         plt.xticks(rotation=45, ha='right')
         plt.tight_layout()
-        plt.savefig(f'{output_dir}bivariate_category_port.png', 
+        plt.savefig(output_dir / 'bivariate_category_port.png', 
                     dpi=300, bbox_inches='tight')
         plt.close()
 
-def multivariate_analysis(df, numerical_cols, output_dir='../../visualizations/'):
+def multivariate_analysis(df, numerical_cols, output_dir):
     """Perform multivariate analysis"""
     print("\n" + "=" * 60)
     print("MULTIVARIATE ANALYSIS")
     print("=" * 60)
     
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
     # Correlation matrix
     numerical_cols_available = [col for col in numerical_cols if col in df.columns]
     if len(numerical_cols_available) > 1:
@@ -148,7 +166,7 @@ def multivariate_analysis(df, numerical_cols, output_dir='../../visualizations/'
                     square=True, linewidths=1, cbar_kws={'shrink': 0.8}, fmt='.3f')
         plt.title('Multivariate Correlation Matrix', fontsize=16, fontweight='bold')
         plt.tight_layout()
-        plt.savefig(f'{output_dir}multivariate_correlation.png', 
+        plt.savefig(output_dir / 'multivariate_correlation.png', 
                     dpi=300, bbox_inches='tight')
         plt.close()
         
@@ -157,8 +175,21 @@ def multivariate_analysis(df, numerical_cols, output_dir='../../visualizations/'
 
 def main():
     """Main function"""
-    # Load data
-    df = load_and_prepare_data('../../data/Cybersecurity_attacks.csv')
+    VIZ_DIR.mkdir(parents=True, exist_ok=True)
+
+    if not DATA_PATH.exists():
+        raise FileNotFoundError(f"Dataset not found: {DATA_PATH}")
+
+    print(f"Loading data from: {DATA_PATH}")
+    df = load_and_prepare_data(DATA_PATH)
+
+    # Optional subsample for faster plot generation
+    sample_n = os.environ.get('CYBER_SAMPLE_N')
+    if sample_n:
+        sample_n = int(sample_n)
+        if sample_n < len(df):
+            df = df.sample(n=sample_n, random_state=42).reset_index(drop=True)
+            print(f"Using CYBER_SAMPLE_N={sample_n} subsample for this run")
     
     # Define columns
     numerical_cols = ['Source Port', 'Destination Port', 'Time_Duration', 'Hour', 'Month']
@@ -168,9 +199,9 @@ def main():
     categorical_cols = [col for col in categorical_cols if col in df.columns]
     
     # Perform analyses
-    univariate_analysis(df, numerical_cols, categorical_cols)
-    bivariate_analysis(df)
-    multivariate_analysis(df, numerical_cols)
+    univariate_analysis(df, numerical_cols, categorical_cols, VIZ_DIR)
+    bivariate_analysis(df, VIZ_DIR)
+    multivariate_analysis(df, numerical_cols, VIZ_DIR)
     
     print("\n" + "=" * 60)
     print("Analysis Complete!")
