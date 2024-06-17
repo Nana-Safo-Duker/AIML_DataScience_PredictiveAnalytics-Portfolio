@@ -7,14 +7,27 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 from scipy.stats import normaltest, shapiro, pearsonr, spearmanr
-import os
-import sys
+from pathlib import Path
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+
+
+def resolve_path(*parts):
+    """Resolve path via project root and cwd candidates."""
+    candidates = [
+        PROJECT_ROOT.joinpath(*parts),
+        Path.cwd().joinpath(*parts),
+        Path.cwd().parent.parent.joinpath(*parts),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate.resolve()
+    return PROJECT_ROOT.joinpath(*parts)
 
 def load_data():
     """Load the dataset"""
-    data_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'FuelConsumption.csv')
+    data_path = resolve_path('data', 'FuelConsumption.csv')
     df = pd.read_csv(data_path)
     df.columns = df.columns.str.strip()
     return df
@@ -100,7 +113,7 @@ def exploratory_statistics(df):
         spearman_corr, spearman_p = spearmanr(data[col], data[target])
         print(f"\n{col} vs {target}:")
         print(f"  Pearson: r={pearson_corr:.4f}, p={pearson_p:.4f}")
-        print(f"  Spearman: ρ={spearman_corr:.4f}, p={spearman_p:.4f}")
+        print(f"  Spearman: rho={spearman_corr:.4f}, p={spearman_p:.4f}")
 
 def main():
     """Main function"""

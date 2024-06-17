@@ -11,8 +11,38 @@ library(xgboost)
 # Suppress warnings
 options(warn = -1)
 
+# Resolve project root robustly (Rscript --file=..., source(), or cwd candidates)
+resolve_project_root <- function(marker_file = file.path("data", "FuelConsumption.csv")) {
+  args <- commandArgs(trailingOnly = FALSE)
+  file_arg <- grep("^--file=", args, value = TRUE)
+  if (length(file_arg) > 0) {
+    script_path <- normalizePath(sub("^--file=", "", file_arg), winslash = "/", mustWork = FALSE)
+    root <- normalizePath(file.path(dirname(script_path), "..", ".."), winslash = "/", mustWork = FALSE)
+    if (file.exists(file.path(root, marker_file))) return(root)
+  }
+  for (i in seq_len(sys.nframe())) {
+    ofile <- sys.frame(i)$ofile
+    if (!is.null(ofile)) {
+      root <- normalizePath(file.path(dirname(ofile), "..", ".."), winslash = "/", mustWork = FALSE)
+      if (file.exists(file.path(root, marker_file))) return(root)
+    }
+  }
+  candidates <- c(
+    getwd(),
+    normalizePath(file.path(getwd(), "..", ".."), winslash = "/", mustWork = FALSE),
+    normalizePath(file.path(getwd(), ".."), winslash = "/", mustWork = FALSE)
+  )
+  for (cand in unique(candidates)) {
+    if (file.exists(file.path(cand, marker_file))) {
+      return(normalizePath(cand, winslash = "/", mustWork = FALSE))
+    }
+  }
+  normalizePath(getwd(), winslash = "/", mustWork = FALSE)
+}
+project_root <- resolve_project_root()
+
 # Load the dataset
-data_path <- file.path("..", "..", "data", "FuelConsumption.csv")
+data_path <- file.path(project_root, "data", "FuelConsumption.csv")
 df <- read.csv(data_path, stringsAsFactors = FALSE)
 
 # Clean column names
@@ -140,7 +170,7 @@ cat("Feature Importance (CO2 Emissions):\n")
 print(feature_importance_co2)
 
 # Save models
-model_dir <- file.path("..", "..", "outputs", "models")
+model_dir <- file.path(project_root, "outputs", "models")
 if(!dir.exists(model_dir)) {
   dir.create(model_dir, recursive = TRUE)
 }

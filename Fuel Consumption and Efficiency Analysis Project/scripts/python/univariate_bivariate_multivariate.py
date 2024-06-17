@@ -8,16 +8,30 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import gaussian_kde
 import os
-import sys
+from pathlib import Path
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+
+
+def resolve_path(*parts):
+    """Resolve path via project root and cwd candidates."""
+    candidates = [
+        PROJECT_ROOT.joinpath(*parts),
+        Path.cwd().joinpath(*parts),
+        Path.cwd().parent.parent.joinpath(*parts),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate.resolve()
+    return PROJECT_ROOT.joinpath(*parts)
 
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (14, 8)
 
 def load_data():
     """Load the dataset"""
-    data_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'FuelConsumption.csv')
+    data_path = resolve_path('data', 'FuelConsumption.csv')
     df = pd.read_csv(data_path)
     df.columns = df.columns.str.strip()
     return df
@@ -58,7 +72,7 @@ def univariate_analysis(df, output_dir):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, 'univariate_analysis.png'), dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ Univariate analysis plots saved!")
+    print("[OK] Univariate analysis plots saved!")
 
 def bivariate_analysis(df, output_dir):
     """Perform bivariate analysis"""
@@ -117,7 +131,7 @@ def bivariate_analysis(df, output_dir):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, 'bivariate_analysis.png'), dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ Bivariate analysis plots saved!")
+    print("[OK] Bivariate analysis plots saved!")
 
 def multivariate_analysis(df, output_dir):
     """Perform multivariate analysis"""
@@ -132,7 +146,7 @@ def multivariate_analysis(df, output_dir):
     plt.suptitle('Pair Plot - Multivariate Analysis', y=1.02)
     plt.savefig(os.path.join(output_dir, 'multivariate_pairplot.png'), dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ Multivariate pair plot saved!")
+    print("[OK] Multivariate pair plot saved!")
     
     # Correlation heatmap
     correlation_matrix = df[numerical_cols].corr()
@@ -143,17 +157,17 @@ def multivariate_analysis(df, output_dir):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, 'multivariate_correlation.png'), dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ Multivariate correlation matrix saved!")
+    print("[OK] Multivariate correlation matrix saved!")
 
 def main():
     """Main function"""
     df = load_data()
-    output_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'outputs', 'figures')
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = PROJECT_ROOT / 'outputs' / 'figures'
+    output_dir.mkdir(parents=True, exist_ok=True)
     
-    univariate_analysis(df, output_dir)
-    bivariate_analysis(df, output_dir)
-    multivariate_analysis(df, output_dir)
+    univariate_analysis(df, str(output_dir))
+    bivariate_analysis(df, str(output_dir))
+    multivariate_analysis(df, str(output_dir))
     
     print("\n" + "="*50)
     print("ANALYSIS COMPLETE!")

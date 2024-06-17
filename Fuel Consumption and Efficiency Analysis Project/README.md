@@ -203,4 +203,26 @@ For questions or issues, please open an issue on the repository.
 ---
 *Enhanced with vehicle efficiency analytics and predictive modeling for fuel consumption patterns*
 
+## Visualizations
 
+Showcase figures are stored in `docs/images/`:
+
+### Fuel vs engine size
+
+![Fuel vs engine size](docs/images/regression_engine_vs_fuel.png)
+
+### Residuals (linear)
+
+![Residuals (linear)](docs/images/residuals_fuel_linear.png)
+
+### Model comparison
+
+![Model comparison](docs/images/model_comparison_fuel.png)
+
+### Correlation heatmap
+
+![Correlation heatmap](docs/images/correlation_heatmap_fuel.png)
+
+### Fuel vs CO2
+
+![Fuel vs CO2](docs/images/regression_fuel_vs_co2.png)

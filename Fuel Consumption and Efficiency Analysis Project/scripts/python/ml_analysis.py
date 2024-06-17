@@ -11,14 +11,27 @@ from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 import joblib
-import os
-import sys
+from pathlib import Path
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+
+
+def resolve_path(*parts):
+    """Resolve path via project root and cwd candidates."""
+    candidates = [
+        PROJECT_ROOT.joinpath(*parts),
+        Path.cwd().joinpath(*parts),
+        Path.cwd().parent.parent.joinpath(*parts),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate.resolve()
+    return PROJECT_ROOT.joinpath(*parts)
 
 def load_data():
     """Load and prepare data"""
-    data_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'FuelConsumption.csv')
+    data_path = resolve_path('data', 'FuelConsumption.csv')
     df = pd.read_csv(data_path)
     df.columns = df.columns.str.strip()
     return df
@@ -109,13 +122,13 @@ def train_models(X, y_fuel, y_co2, features):
     print(f"  MAE: {mean_absolute_error(y_co2_test, y_co2_pred):.4f}")
     
     # Save models
-    model_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'outputs', 'models')
-    os.makedirs(model_dir, exist_ok=True)
+    model_dir = PROJECT_ROOT / 'outputs' / 'models'
+    model_dir.mkdir(parents=True, exist_ok=True)
     
-    joblib.dump(rf_fuel, os.path.join(model_dir, 'random_forest_fuel.pkl'))
-    joblib.dump(rf_co2, os.path.join(model_dir, 'random_forest_co2.pkl'))
-    joblib.dump(scaler, os.path.join(model_dir, 'scaler.pkl'))
-    print("\n✓ Models saved!")
+    joblib.dump(rf_fuel, model_dir / 'random_forest_fuel.pkl')
+    joblib.dump(rf_co2, model_dir / 'random_forest_co2.pkl')
+    joblib.dump(scaler, model_dir / 'scaler.pkl')
+    print("\n[OK] Models saved!")
     
     return rf_fuel, rf_co2
 

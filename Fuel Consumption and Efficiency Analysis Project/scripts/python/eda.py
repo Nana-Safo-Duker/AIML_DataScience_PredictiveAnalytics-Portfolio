@@ -10,9 +10,23 @@ import seaborn as sns
 import warnings
 import os
 import sys
+from pathlib import Path
 
-# Add parent directory to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+
+
+def resolve_path(*parts):
+    """Resolve path via project root and cwd candidates."""
+    candidates = [
+        PROJECT_ROOT.joinpath(*parts),
+        Path.cwd().joinpath(*parts),
+        Path.cwd().parent.parent.joinpath(*parts),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate.resolve()
+    return PROJECT_ROOT.joinpath(*parts)
 
 warnings.filterwarnings('ignore')
 
@@ -22,7 +36,7 @@ plt.rcParams['figure.figsize'] = (12, 6)
 
 def load_data():
     """Load the fuel consumption dataset"""
-    data_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'FuelConsumption.csv')
+    data_path = resolve_path('data', 'FuelConsumption.csv')
     df = pd.read_csv(data_path)
     # Clean column names (remove trailing spaces)
     df.columns = df.columns.str.strip()
@@ -62,7 +76,7 @@ def data_quality_check(df):
         print("\nMissing Values:")
         print(missing_df)
     else:
-        print("\n✓ No missing values found!")
+        print("\n[OK] No missing values found!")
     
     # Duplicates
     duplicate_count = df.duplicated().sum()
@@ -78,7 +92,7 @@ def clean_data(df):
     
     # Clean column names
     df.columns = df.columns.str.strip()
-    print("✓ Column names cleaned!")
+    print("[OK] Column names cleaned!")
     
     return df
 
@@ -106,7 +120,7 @@ def analyze_distributions(df, output_dir):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, 'distribution_analysis.png'), dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ Distribution plots saved!")
+    print("[OK] Distribution plots saved!")
     
     # Box plots
     fig, axes = plt.subplots(2, 2, figsize=(15, 10))
@@ -120,7 +134,7 @@ def analyze_distributions(df, output_dir):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, 'boxplot_analysis.png'), dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ Box plots saved!")
+    print("[OK] Box plots saved!")
 
 def analyze_categorical(df, output_dir):
     """Analyze categorical variables"""
@@ -159,7 +173,7 @@ def analyze_categorical(df, output_dir):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, 'categorical_analysis.png'), dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ Categorical analysis plots saved!")
+    print("[OK] Categorical analysis plots saved!")
 
 def analyze_correlation(df, output_dir):
     """Analyze correlations"""
@@ -177,7 +191,7 @@ def analyze_correlation(df, output_dir):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, 'correlation_matrix.png'), dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ Correlation matrix saved!")
+    print("[OK] Correlation matrix saved!")
     
     print("\nCorrelation Matrix:")
     print(correlation_matrix)
@@ -216,7 +230,7 @@ def analyze_temporal_trends(df, output_dir):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, 'yearly_trends.png'), dpi=300, bbox_inches='tight')
     plt.close()
-    print("✓ Temporal trend plots saved!")
+    print("[OK] Temporal trend plots saved!")
 
 def detect_outliers(df):
     """Detect outliers using IQR method"""
@@ -275,20 +289,20 @@ def main():
     df = clean_data(df)
     
     # Set output directory
-    output_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'outputs', 'figures')
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = PROJECT_ROOT / 'outputs' / 'figures'
+    output_dir.mkdir(parents=True, exist_ok=True)
     
     # Analyze distributions
-    analyze_distributions(df, output_dir)
+    analyze_distributions(df, str(output_dir))
     
     # Analyze categorical variables
-    analyze_categorical(df, output_dir)
+    analyze_categorical(df, str(output_dir))
     
     # Analyze correlations
-    analyze_correlation(df, output_dir)
+    analyze_correlation(df, str(output_dir))
     
     # Analyze temporal trends
-    analyze_temporal_trends(df, output_dir)
+    analyze_temporal_trends(df, str(output_dir))
     
     # Detect outliers
     detect_outliers(df)
@@ -297,9 +311,10 @@ def main():
     generate_summary(df)
     
     # Save cleaned dataset
-    output_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'FuelConsumption_cleaned.csv')
+    output_path = PROJECT_ROOT / 'data' / 'FuelConsumption_cleaned.csv'
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(output_path, index=False)
-    print("\n✓ Cleaned dataset saved!")
+    print("\n[OK] Cleaned dataset saved!")
     
     print("\n" + "="*50)
     print("EDA COMPLETE!")
