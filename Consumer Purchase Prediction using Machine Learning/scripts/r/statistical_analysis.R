@@ -8,62 +8,22 @@ library(car)
 library(psych)
 library(e1071)
 
-# Function to find project root by looking for data directory
-find_project_root <- function() {
-  current_dir <- getwd()
-  max_levels <- 10
-  project_marker <- file.path("Consumer Purchase Prediction", "Consumer Purchase Prediction", "data", "Advertisement.csv")
-  
-  for (i in 1:max_levels) {
-    if (file.exists(file.path(current_dir, project_marker))) {
-      return(current_dir)
-    }
-    if (file.exists(file.path(current_dir, "data", "Advertisement.csv"))) {
-      return(current_dir)
-    }
-    if (basename(current_dir) == "Consumer Purchase Prediction") {
-      if (file.exists(file.path(current_dir, "Consumer Purchase Prediction", "data", "Advertisement.csv"))) {
-        return(current_dir)
-      }
-      if (file.exists(file.path(current_dir, "data", "Advertisement.csv"))) {
-        return(current_dir)
-      }
-    }
-    parent_dir <- dirname(current_dir)
-    if (parent_dir == current_dir) break
-    current_dir <- parent_dir
-  }
-  return(NULL)
+# Multi-candidate path resolution (project root or scripts/r/)
+data_path <- file.path("data", "Advertisement.csv")
+output_dir <- "output"
+if (!file.exists(data_path)) {
+  data_path <- file.path("..", "..", "data", "Advertisement.csv")
+  output_dir <- file.path("..", "..", "output")
 }
-
-# Set working directory to project root
-project_root <- find_project_root()
-if (!is.null(project_root)) {
-  setwd(project_root)
-  cat("Working directory set to:", getwd(), "\n")
-} else {
-  cat("Warning: Could not find project root. Using current directory:", getwd(), "\n")
+if (!file.exists(data_path)) {
+  data_path <- file.path("..", "data", "Advertisement.csv")
+  output_dir <- file.path("..", "output")
 }
-
-# Load the dataset - try multiple possible paths
-data_paths <- c(
-  file.path("Consumer Purchase Prediction", "Consumer Purchase Prediction", "data", "Advertisement.csv"),
-  file.path("data", "Advertisement.csv"),
-  "Advertisement.csv"
-)
-
-data_path <- NULL
-for (path in data_paths) {
-  if (file.exists(path)) {
-    data_path <- path
-    break
-  }
+if (!file.exists(data_path)) {
+  stop(paste("Cannot find Advertisement.csv. Current working directory:", getwd()))
 }
-
-if (is.null(data_path)) {
-  stop(paste("Cannot find Advertisement.csv. Searched in:\n",
-             paste("  -", data_paths, collapse = "\n"),
-             "\nCurrent working directory:", getwd()))
+if (!dir.exists(output_dir)) {
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 }
 
 df <- read.csv(data_path, stringsAsFactors = TRUE)

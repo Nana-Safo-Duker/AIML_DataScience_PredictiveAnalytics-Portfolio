@@ -21,6 +21,12 @@ import pickle
 import os
 warnings.filterwarnings('ignore')
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..'))
+DATA_PATH = os.path.join(PROJECT_ROOT, 'data', 'Advertisement.csv')
+OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'output')
+MODELS_DIR = os.path.join(PROJECT_ROOT, 'models')
+
 def load_and_preprocess_data(file_path):
     """Load and preprocess data"""
     df = pd.read_csv(file_path)
@@ -102,8 +108,10 @@ def train_and_evaluate_models(X_train, X_test, X_train_scaled, X_test_scaled, y_
     
     return results
 
-def plot_results(results, y_test, output_dir='../../output'):
+def plot_results(results, y_test, output_dir=None):
     """Plot model comparison and evaluation metrics"""
+    if output_dir is None:
+        output_dir = OUTPUT_DIR
     os.makedirs(output_dir, exist_ok=True)
     
     # Model comparison
@@ -139,7 +147,7 @@ def plot_results(results, y_test, output_dir='../../output'):
     ax.legend()
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(f'{output_dir}/model_comparison.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(output_dir, 'model_comparison.png'), dpi=300, bbox_inches='tight')
     plt.close()
     
     # Confusion matrices
@@ -154,7 +162,7 @@ def plot_results(results, y_test, output_dir='../../output'):
         axes[idx].set_xlabel('Predicted Label')
     
     plt.tight_layout()
-    plt.savefig(f'{output_dir}/confusion_matrices.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(output_dir, 'confusion_matrices.png'), dpi=300, bbox_inches='tight')
     plt.close()
     
     # ROC curves
@@ -173,7 +181,7 @@ def plot_results(results, y_test, output_dir='../../output'):
     plt.legend(loc="lower right")
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(f'{output_dir}/roc_curves.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(output_dir, 'roc_curves.png'), dpi=300, bbox_inches='tight')
     plt.close()
 
 def main():
@@ -183,7 +191,7 @@ def main():
     
     # Load and preprocess data
     X_train, X_test, X_train_scaled, X_test_scaled, y_train, y_test, scaler, le = \
-        load_and_preprocess_data('../../data/Advertisement.csv')
+        load_and_preprocess_data(DATA_PATH)
     
     # Train and evaluate models
     results = train_and_evaluate_models(
@@ -207,8 +215,8 @@ def main():
     print(classification_report(y_test, best_model['y_pred']))
     
     # Save best model
-    os.makedirs('../../models', exist_ok=True)
-    with open('../../models/best_model.pkl', 'wb') as f:
+    os.makedirs(MODELS_DIR, exist_ok=True)
+    with open(os.path.join(MODELS_DIR, 'best_model.pkl'), 'wb') as f:
         pickle.dump(best_model['model'], f)
     print(f"\nBest model saved to models/best_model.pkl")
     

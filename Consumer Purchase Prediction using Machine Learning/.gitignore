@@ -55,6 +55,8 @@ results/*
 *.jpg
 *.pdf
 *.html
+!docs/images/
+!docs/images/**
 
 # OS
 .DS_Store

@@ -300,3 +300,26 @@ For questions or suggestions, please open an issue in the repository.
 ---
 *Last updated: June 2024***
 
+## Visualizations
+
+Showcase figures are stored in `docs/images/`:
+
+### Class distribution
+
+![Class distribution](docs/images/class_distribution.png)
+
+### Age vs salary by purchase
+
+![Age vs salary by purchase](docs/images/age_salary_scatter.png)
+
+### Model comparison
+
+![Model comparison](docs/images/model_comparison.png)
+
+### ROC curves
+
+![ROC curves](docs/images/roc_curves.png)
+
+### Feature importance
+
+![Feature importance](docs/images/feature_importance.png)

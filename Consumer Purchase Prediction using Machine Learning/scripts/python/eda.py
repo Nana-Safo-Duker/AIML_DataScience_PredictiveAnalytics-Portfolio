@@ -3,6 +3,7 @@ Exploratory Data Analysis Script
 Consumer Purchase Prediction Project
 """
 
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,6 +14,13 @@ warnings.filterwarnings('ignore')
 # Set visualization style
 plt.style.use('seaborn-v0_8-darkgrid')
 sns.set_palette("husl")
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..'))
+DATA_PATH = os.path.join(PROJECT_ROOT, 'data', 'Advertisement.csv')
+OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'output')
+MODELS_DIR = os.path.join(PROJECT_ROOT, 'models')
+
 
 def load_data(file_path):
     """Load the dataset"""
@@ -58,7 +66,7 @@ def analyze_target_variable(df):
     axes[1].pie(purchased_counts.values, labels=['No', 'Yes'], autopct='%1.1f%%', startangle=90)
     axes[1].set_title('Purchased Distribution (Pie Chart)')
     plt.tight_layout()
-    plt.savefig('../../output/target_distribution.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(OUTPUT_DIR, 'target_distribution.png'), dpi=300, bbox_inches='tight')
     plt.close()
 
 def analyze_numerical_variables(df):
@@ -80,7 +88,7 @@ def analyze_numerical_variables(df):
         axes[idx, 1].set_ylabel(col)
     
     plt.tight_layout()
-    plt.savefig('../../output/numerical_distributions.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(OUTPUT_DIR, 'numerical_distributions.png'), dpi=300, bbox_inches='tight')
     plt.close()
 
 def analyze_categorical_variables(df):
@@ -103,7 +111,7 @@ def analyze_categorical_variables(df):
     axes[1].pie(gender_counts.values, labels=gender_counts.index, autopct='%1.1f%%', startangle=90)
     axes[1].set_title('Gender Distribution (Pie Chart)')
     plt.tight_layout()
-    plt.savefig('../../output/categorical_distributions.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(OUTPUT_DIR, 'categorical_distributions.png'), dpi=300, bbox_inches='tight')
     plt.close()
 
 def analyze_relationships(df):
@@ -122,7 +130,7 @@ def analyze_relationships(df):
     axes[1].set_title('Salary Distribution by Purchase Status')
     axes[1].set_xticklabels(['No', 'Yes'])
     plt.tight_layout()
-    plt.savefig('../../output/relationships.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(OUTPUT_DIR, 'relationships.png'), dpi=300, bbox_inches='tight')
     plt.close()
     
     # Scatter plot
@@ -136,7 +144,7 @@ def analyze_relationships(df):
     plt.title('Age vs Estimated Salary (colored by Purchase Status)')
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig('../../output/scatter_plot.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(OUTPUT_DIR, 'scatter_plot.png'), dpi=300, bbox_inches='tight')
     plt.close()
 
 def correlation_analysis(df):
@@ -156,17 +164,15 @@ def correlation_analysis(df):
                 center=0, square=True, linewidths=1, cbar_kws={"shrink": 0.8})
     plt.title('Correlation Matrix')
     plt.tight_layout()
-    plt.savefig('../../output/correlation_matrix.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(OUTPUT_DIR, 'correlation_matrix.png'), dpi=300, bbox_inches='tight')
     plt.close()
 
 def main():
     """Main function to run EDA"""
-    # Create output directory
-    import os
-    os.makedirs('../../output', exist_ok=True)
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
     
     # Load data
-    df = load_data('../../data/Advertisement.csv')
+    df = load_data(DATA_PATH)
     
     # Perform analysis
     data_overview(df)
@@ -182,4 +188,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

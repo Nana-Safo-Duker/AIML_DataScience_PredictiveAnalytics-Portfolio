@@ -3,6 +3,7 @@ Univariate, Bivariate, and Multivariate Analysis Script
 Consumer Purchase Prediction Project
 """
 
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,14 +13,21 @@ from scipy.stats import ttest_ind
 import warnings
 warnings.filterwarnings('ignore')
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..'))
+DATA_PATH = os.path.join(PROJECT_ROOT, 'data', 'Advertisement.csv')
+OUTPUT_DIR = os.path.join(PROJECT_ROOT, 'output')
+
+
 def load_data(file_path):
     """Load the dataset"""
     df = pd.read_csv(file_path)
     return df
 
-def univariate_analysis(df, output_dir='../../output'):
+def univariate_analysis(df, output_dir=None):
     """Perform univariate analysis"""
-    import os
+    if output_dir is None:
+        output_dir = OUTPUT_DIR
     os.makedirs(output_dir, exist_ok=True)
     
     numeric_cols = ['Age', 'EstimatedSalary']
@@ -48,7 +56,7 @@ def univariate_analysis(df, output_dir='../../output'):
         axes[1, 1].set_xlabel(col)
         
         plt.tight_layout()
-        plt.savefig(f'{output_dir}/univariate_{col.lower()}.png', dpi=300, bbox_inches='tight')
+        plt.savefig(os.path.join(output_dir, f'univariate_{col.lower()}.png'), dpi=300, bbox_inches='tight')
         plt.close()
         
         print(f"\n{col} Statistics:")
@@ -58,9 +66,10 @@ def univariate_analysis(df, output_dir='../../output'):
         print(f"Skewness: {df[col].skew():.3f}")
         print(f"Kurtosis: {df[col].kurtosis():.3f}")
 
-def bivariate_analysis(df, output_dir='../../output'):
+def bivariate_analysis(df, output_dir=None):
     """Perform bivariate analysis"""
-    import os
+    if output_dir is None:
+        output_dir = OUTPUT_DIR
     os.makedirs(output_dir, exist_ok=True)
     
     # Age vs Purchased
@@ -77,7 +86,7 @@ def bivariate_analysis(df, output_dir='../../output'):
     axes[2].set_title('Age Distribution by Purchase Status (Strip)')
     axes[2].set_xticklabels(['No', 'Yes'])
     plt.tight_layout()
-    plt.savefig(f'{output_dir}/bivariate_age_purchased.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(output_dir, 'bivariate_age_purchased.png'), dpi=300, bbox_inches='tight')
     plt.close()
     
     # Salary vs Purchased
@@ -94,7 +103,7 @@ def bivariate_analysis(df, output_dir='../../output'):
     axes[2].set_title('Estimated Salary Distribution by Purchase Status (Strip)')
     axes[2].set_xticklabels(['No', 'Yes'])
     plt.tight_layout()
-    plt.savefig(f'{output_dir}/bivariate_salary_purchased.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(output_dir, 'bivariate_salary_purchased.png'), dpi=300, bbox_inches='tight')
     plt.close()
     
     # Age vs Salary
@@ -108,7 +117,7 @@ def bivariate_analysis(df, output_dir='../../output'):
     plt.title('Age vs Estimated Salary (colored by Purchase Status)')
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(f'{output_dir}/bivariate_age_salary.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(output_dir, 'bivariate_age_salary.png'), dpi=300, bbox_inches='tight')
     plt.close()
     
     # Statistical tests
@@ -122,9 +131,10 @@ def bivariate_analysis(df, output_dir='../../output'):
     t_stat, p_value = ttest_ind(salary_0, salary_1)
     print(f"Salary T-test: t-statistic={t_stat:.4f}, p-value={p_value:.4f}")
 
-def multivariate_analysis(df, output_dir='../../output'):
+def multivariate_analysis(df, output_dir=None):
     """Perform multivariate analysis"""
-    import os
+    if output_dir is None:
+        output_dir = OUTPUT_DIR
     os.makedirs(output_dir, exist_ok=True)
     
     # Pairwise relationships
@@ -132,7 +142,7 @@ def multivariate_analysis(df, output_dir='../../output'):
                  hue='Purchased', diag_kind='kde')
     plt.suptitle('Pairwise Relationships', y=1.02)
     plt.tight_layout()
-    plt.savefig(f'{output_dir}/multivariate_pairplot.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(output_dir, 'multivariate_pairplot.png'), dpi=300, bbox_inches='tight')
     plt.close()
     
     # Correlation matrix
@@ -142,12 +152,13 @@ def multivariate_analysis(df, output_dir='../../output'):
                 center=0, square=True, linewidths=1, cbar_kws={"shrink": 0.8})
     plt.title('Correlation Matrix')
     plt.tight_layout()
-    plt.savefig(f'{output_dir}/multivariate_correlation.png', dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(output_dir, 'multivariate_correlation.png'), dpi=300, bbox_inches='tight')
     plt.close()
 
 def main():
     """Main function"""
-    df = load_data('../../data/Advertisement.csv')
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    df = load_data(DATA_PATH)
     
     print("UNIVARIATE ANALYSIS")
     print("="*50)
@@ -167,4 +178,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -7,67 +7,22 @@ library(ggplot2)
 library(corrplot)
 library(VIM)
 
-# Function to find project root by looking for data directory
-find_project_root <- function() {
-  # Start from current working directory
-  current_dir <- getwd()
-  max_levels <- 10
-  project_marker <- file.path("Consumer Purchase Prediction", "Consumer Purchase Prediction", "data", "Advertisement.csv")
-  
-  for (i in 1:max_levels) {
-    # Check for the data file in nested structure
-    if (file.exists(file.path(current_dir, project_marker))) {
-      return(current_dir)
-    }
-    # Check for data file in current directory structure
-    if (file.exists(file.path(current_dir, "data", "Advertisement.csv"))) {
-      return(current_dir)
-    }
-    # Check if we're in the Consumer Purchase Prediction directory
-    if (basename(current_dir) == "Consumer Purchase Prediction") {
-      if (file.exists(file.path(current_dir, "Consumer Purchase Prediction", "data", "Advertisement.csv"))) {
-        return(current_dir)
-      }
-      if (file.exists(file.path(current_dir, "data", "Advertisement.csv"))) {
-        return(current_dir)
-      }
-    }
-    # Move up one level
-    parent_dir <- dirname(current_dir)
-    if (parent_dir == current_dir) break  # Reached root
-    current_dir <- parent_dir
-  }
-  return(NULL)
+# Multi-candidate path resolution (project root or scripts/r/)
+data_path <- file.path("data", "Advertisement.csv")
+output_dir <- "output"
+if (!file.exists(data_path)) {
+  data_path <- file.path("..", "..", "data", "Advertisement.csv")
+  output_dir <- file.path("..", "..", "output")
 }
-
-# Set working directory to project root
-project_root <- find_project_root()
-if (!is.null(project_root)) {
-  setwd(project_root)
-  cat("Working directory set to:", getwd(), "\n")
-} else {
-  cat("Warning: Could not find project root. Using current directory:", getwd(), "\n")
+if (!file.exists(data_path)) {
+  data_path <- file.path("..", "data", "Advertisement.csv")
+  output_dir <- file.path("..", "output")
 }
-
-# Load the dataset - try multiple possible paths
-data_paths <- c(
-  file.path("Consumer Purchase Prediction", "Consumer Purchase Prediction", "data", "Advertisement.csv"),
-  file.path("data", "Advertisement.csv"),
-  "Advertisement.csv"
-)
-
-data_path <- NULL
-for (path in data_paths) {
-  if (file.exists(path)) {
-    data_path <- path
-    break
-  }
+if (!file.exists(data_path)) {
+  stop(paste("Cannot find Advertisement.csv. Current working directory:", getwd()))
 }
-
-if (is.null(data_path)) {
-  stop(paste("Cannot find Advertisement.csv. Searched in:\n",
-             paste("  -", data_paths, collapse = "\n"),
-             "\nCurrent working directory:", getwd()))
+if (!dir.exists(output_dir)) {
+  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 }
 
 df <- read.csv(data_path, stringsAsFactors = TRUE)
@@ -104,30 +59,6 @@ cat("Purchased Distribution:\n")
 print(purchased_counts)
 cat("\nPercentage:\n")
 print(prop.table(purchased_counts) * 100)
-
-# Create output directory if it doesn't exist
-output_paths <- c(
-  file.path("Consumer Purchase Prediction", "Consumer Purchase Prediction", "output"),
-  "output"
-)
-
-output_dir <- NULL
-for (path in output_paths) {
-  if (dir.exists(path)) {
-    output_dir <- path
-    break
-  }
-}
-
-if (is.null(output_dir)) {
-  # Create the first possible output directory
-  output_dir <- output_paths[1]
-  if (!dir.exists(dirname(output_dir))) {
-    dir.create(dirname(output_dir), recursive = TRUE)
-  }
-  dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
-  cat("Created output directory:", output_dir, "\n")
-}
 
 # Visualize target variable
 png(file.path(output_dir, "target_distribution_r.png"), width = 1200, height = 600, res = 300)
