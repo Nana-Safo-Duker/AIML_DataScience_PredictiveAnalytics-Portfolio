@@ -16,6 +16,7 @@ from sklearn.metrics import (accuracy_score, precision_score, recall_score,
                             f1_score, confusion_matrix, classification_report,
                             roc_auc_score, roc_curve)
 import xgboost as xgb
+from pathlib import Path
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -23,9 +24,19 @@ warnings.filterwarnings('ignore')
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (12, 6)
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+DATA_CLEAN = PROJECT_ROOT / 'data' / 'emails_spam_clean.csv'
+FIGURES_DIR = PROJECT_ROOT / 'output' / 'figures'
+MODELS_DIR = PROJECT_ROOT / 'models'
+FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+MODELS_DIR.mkdir(parents=True, exist_ok=True)
+
 def load_and_prepare_data():
     """Load and prepare data for ML"""
-    df = pd.read_csv('../../data/emails_spam_clean.csv')
+    if not DATA_CLEAN.exists():
+        raise FileNotFoundError(f"Dataset not found: {DATA_CLEAN}")
+    df = pd.read_csv(DATA_CLEAN)
     
     # Clean text
     import re
@@ -209,7 +220,7 @@ def compare_models(results):
         axes[idx//2, idx%2].grid(True, alpha=0.3, axis='x')
     
     plt.tight_layout()
-    plt.savefig('../../output/figures/model_comparison.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'model_comparison.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     # Find best model
@@ -252,7 +263,7 @@ def main():
         plot_confusion_matrix(
             result['confusion_matrix'], 
             model_name, 
-            f"../../output/figures/cm_{model_name.replace(' ', '_').replace('(', '').replace(')', '')}.png"
+            str(FIGURES_DIR / f"cm_{model_name.replace(' ', '_').replace('(', '').replace(')', '')}.png")
         )
         
         # Plot ROC curve
@@ -260,7 +271,7 @@ def main():
             result['y_test'],
             result['y_pred_proba'],
             model_name,
-            f"../../output/figures/roc_{model_name.replace(' ', '_').replace('(', '').replace(')', '')}.png"
+            str(FIGURES_DIR / f"roc_{model_name.replace(' ', '_').replace('(', '').replace(')', '')}.png")
         )
     
     # Compare models
@@ -269,9 +280,10 @@ def main():
     # Save best model
     best_result = max(results, key=lambda x: x['f1'])
     import joblib
-    joblib.dump(best_result['model'], f"../../models/best_model_{best_result['model_name'].replace(' ', '_')}.pkl")
-    joblib.dump(tfidf_vectorizer, "../../models/tfidf_vectorizer.pkl")
-    print(f"\nBest model saved: best_model_{best_result['model_name'].replace(' ', '_')}.pkl")
+    model_name_safe = best_result['model_name'].replace(' ', '_')
+    joblib.dump(best_result['model'], MODELS_DIR / f"best_model_{model_name_safe}.pkl")
+    joblib.dump(tfidf_vectorizer, MODELS_DIR / "tfidf_vectorizer.pkl")
+    print(f"\nBest model saved: best_model_{model_name_safe}.pkl")
     
     print("\n" + "="*60)
     print("Machine Learning Analysis Complete!")

@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 from scipy.stats import ttest_ind, chi2_contingency, mannwhitneyu
+from pathlib import Path
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -16,12 +17,19 @@ warnings.filterwarnings('ignore')
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (12, 6)
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+DATA_PROCESSED = PROJECT_ROOT / 'data' / 'emails_spam_processed.csv'
+DATA_CLEAN = PROJECT_ROOT / 'data' / 'emails_spam_clean.csv'
+FIGURES_DIR = PROJECT_ROOT / 'output' / 'figures'
+FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+
 def load_data():
     """Load processed dataset"""
-    try:
-        df = pd.read_csv('../../data/emails_spam_processed.csv')
-    except:
-        df = pd.read_csv('../../data/emails_spam_clean.csv')
+    if DATA_PROCESSED.exists():
+        df = pd.read_csv(DATA_PROCESSED)
+    else:
+        df = pd.read_csv(DATA_CLEAN)
         # Calculate basic features if not present
         df['text_length'] = df['text'].str.len()
         df['word_count'] = df['text'].str.split().str.len()
@@ -92,9 +100,9 @@ def inferential_statistics(df):
     print("\n1. Independent Samples T-Test:")
     print("Testing if there's a significant difference in means between Spam and Ham")
     print("\nHypotheses:")
-    print("H0: μ_spam = μ_ham (no difference in means)")
-    print("H1: μ_spam ≠ μ_ham (significant difference in means)")
-    print("\nSignificance level: α = 0.05")
+    print("H0: mu_spam = mu_ham (no difference in means)")
+    print("H1: mu_spam != mu_ham (significant difference in means)")
+    print("\nSignificance level: alpha = 0.05")
     
     for col in numeric_cols:
         spam_data = df[df['spam']==1][col].dropna()
@@ -170,7 +178,7 @@ def exploratory_statistical_analysis(df):
                 square=True, linewidths=1, cbar_kws={"shrink": 0.8})
     plt.title('Correlation Matrix')
     plt.tight_layout()
-    plt.savefig('../../output/figures/correlation_matrix.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'correlation_matrix.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     # Distribution analysis
@@ -189,7 +197,7 @@ def exploratory_statistical_analysis(df):
         axes[idx].grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('../../output/figures/distributions.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'distributions.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     # Q-Q plots for normality check

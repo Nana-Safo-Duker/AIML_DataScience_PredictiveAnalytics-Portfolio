@@ -264,3 +264,27 @@ For questions or suggestions, please open an issue in the repository.
 *Enhanced with improved spam classification ML pipeline including NLP preprocessing and comprehensive evaluation metrics*
 
 **Last Updated**: June 2024
+
+## Visualizations
+
+Showcase figures are stored in `docs/images/`:
+
+### Class distribution
+
+![Class distribution](docs/images/class_distribution.png)
+
+### Text length by class
+
+![Text length by class](docs/images/text_length_by_class.png)
+
+### Model comparison
+
+![Model comparison](docs/images/model_comparison.png)
+
+### ROC curves
+
+![ROC curves](docs/images/roc_curves.png)
+
+### Confusion matrix
+
+![Confusion matrix](docs/images/confusion_matrix.png)

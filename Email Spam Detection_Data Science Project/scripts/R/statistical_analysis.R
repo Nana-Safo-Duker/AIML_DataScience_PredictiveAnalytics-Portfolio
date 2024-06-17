@@ -8,14 +8,28 @@ library(corrplot)
 library(psych)
 library(Hmisc)
 
+# Multi-candidate path resolution (project root or scripts/r/)
+project_root <- NULL
+for (cand in c(".", file.path("..", ".."), "..")) {
+  if (file.exists(file.path(cand, "data", "emails_spam_clean.csv"))) {
+    project_root <- normalizePath(cand, winslash = "/", mustWork = FALSE)
+    break
+  }
+}
+if (is.null(project_root)) {
+  stop(paste("Cannot find data/emails_spam_clean.csv. CWD:", getwd()))
+}
+setwd(project_root)
+dir.create(file.path("output", "figures"), recursive = TRUE, showWarnings = FALSE)
+
 # Load data
-tryCatch({
-  df <- read.csv("../../data/emails_spam_processed.csv", stringsAsFactors = FALSE)
-}, error = function(e) {
-  df <- read.csv("../../data/emails_spam_clean.csv", stringsAsFactors = FALSE)
+if (file.exists(file.path("data", "emails_spam_processed.csv"))) {
+  df <- read.csv(file.path("data", "emails_spam_processed.csv"), stringsAsFactors = FALSE)
+} else {
+  df <- read.csv(file.path("data", "emails_spam_clean.csv"), stringsAsFactors = FALSE)
   df$text_length <- nchar(df$text)
   df$word_count <- str_count(df$text, "\\S+")
-})
+}
 
 # Helper function for string concatenation
 `%+%` <- function(a, b) paste0(a, b)
@@ -136,14 +150,14 @@ correlation_matrix <- cor(df[c(numeric_cols, "spam")], use = "complete.obs")
 print(correlation_matrix)
 
 # Visualize correlation matrix
-png("../../output/figures/correlation_matrix_R.png", width = 1000, height = 1000, res = 300)
+png("output/figures/correlation_matrix_R.png", width = 1000, height = 1000, res = 300)
 corrplot(correlation_matrix, method = "color", type = "upper", 
          order = "hclust", tl.cex = 0.8, tl.col = "black")
 dev.off()
 
 # Distribution analysis
 cat("\n2. Distribution Analysis:\n")
-png("../../output/figures/distributions_R.png", width = 1600, height = 1200, res = 300)
+png("output/figures/distributions_R.png", width = 1600, height = 1200, res = 300)
 par(mfrow = c(2, 2))
 
 for (col in numeric_cols[1:min(4, length(numeric_cols))]) {

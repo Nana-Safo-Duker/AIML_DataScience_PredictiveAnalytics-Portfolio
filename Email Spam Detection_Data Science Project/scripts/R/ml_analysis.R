@@ -12,8 +12,23 @@ library(naivebayes)
 library(pROC)
 library(ggplot2)
 
+# Multi-candidate path resolution (project root or scripts/r/)
+project_root <- NULL
+for (cand in c(".", file.path("..", ".."), "..")) {
+  if (file.exists(file.path(cand, "data", "emails_spam_clean.csv"))) {
+    project_root <- normalizePath(cand, winslash = "/", mustWork = FALSE)
+    break
+  }
+}
+if (is.null(project_root)) {
+  stop(paste("Cannot find data/emails_spam_clean.csv. CWD:", getwd()))
+}
+setwd(project_root)
+dir.create(file.path("output", "figures"), recursive = TRUE, showWarnings = FALSE)
+dir.create("models", recursive = TRUE, showWarnings = FALSE)
+
 # Load and prepare data
-df <- read.csv("../../data/emails_spam_clean.csv", stringsAsFactors = FALSE)
+df <- read.csv(file.path("data", "emails_spam_clean.csv"), stringsAsFactors = FALSE)
 
 # Clean text function
 clean_text <- function(text) {
@@ -162,7 +177,7 @@ comparison <- data.frame(
 print(comparison)
 
 # Visualize comparison
-png("../../output/figures/model_comparison_R.png", width = 1600, height = 1200, res = 300)
+png("output/figures/model_comparison_R.png", width = 1600, height = 1200, res = 300)
 par(mfrow = c(2, 2))
 
 metrics <- c("Accuracy", "Precision", "Recall", "F1_Score")
@@ -182,7 +197,7 @@ cat("  F1-Score:", comparison$F1_Score[best_idx], "\n")
 cat("  Accuracy:", comparison$Accuracy[best_idx], "\n")
 
 # Save best model
-saveRDS(results[[best_idx]]$model, paste0("../../models/best_model_", gsub(" ", "_", best_model), ".rds"))
+saveRDS(results[[best_idx]]$model, paste0("models/best_model_", gsub(" ", "_", best_model), ".rds"))
 cat("\nBest model saved!\n")
 
 cat("\n", paste(rep("=", 60), collapse = ""), "\n", sep = "")

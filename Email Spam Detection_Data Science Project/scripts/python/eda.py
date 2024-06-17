@@ -10,6 +10,7 @@ import re
 from collections import Counter
 from wordcloud import WordCloud
 import os
+from pathlib import Path
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -17,12 +18,18 @@ warnings.filterwarnings('ignore')
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (12, 6)
 
-# Create output directory
-os.makedirs('../../output/figures', exist_ok=True)
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+DATA_CLEAN = PROJECT_ROOT / 'data' / 'emails_spam_clean.csv'
+DATA_PROCESSED = PROJECT_ROOT / 'data' / 'emails_spam_processed.csv'
+FIGURES_DIR = PROJECT_ROOT / 'output' / 'figures'
+FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 def load_data():
     """Load the cleaned dataset"""
-    df = pd.read_csv('../../data/emails_spam_clean.csv')
+    if not DATA_CLEAN.exists():
+        raise FileNotFoundError(f"Dataset not found: {DATA_CLEAN}")
+    df = pd.read_csv(DATA_CLEAN)
     print(f"Dataset Shape: {df.shape}")
     print(f"Columns: {df.columns.tolist()}")
     return df
@@ -47,7 +54,7 @@ def basic_info(df):
         plt.title('Missing Values by Column')
         plt.ylabel('Count')
         plt.tight_layout()
-        plt.savefig('../../output/figures/missing_values.png')
+        plt.savefig(FIGURES_DIR / 'missing_values.png')
         plt.close()
 
 def target_analysis(df):
@@ -76,7 +83,7 @@ def target_analysis(df):
     axes[1].set_ylabel('')
     
     plt.tight_layout()
-    plt.savefig('../../output/figures/target_distribution.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'target_distribution.png', dpi=300, bbox_inches='tight')
     plt.close()
 
 def text_statistics(df):
@@ -128,7 +135,7 @@ def text_statistics(df):
     axes[1, 1].set_ylabel('Word Count')
     
     plt.tight_layout()
-    plt.savefig('../../output/figures/text_statistics.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'text_statistics.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     return df
@@ -199,7 +206,7 @@ def word_frequency_analysis(df):
     axes[1].axis('off')
     
     plt.tight_layout()
-    plt.savefig('../../output/figures/wordclouds.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'wordclouds.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     # Plot top words
@@ -224,7 +231,7 @@ def word_frequency_analysis(df):
     axes[1].invert_yaxis()
     
     plt.tight_layout()
-    plt.savefig('../../output/figures/top_words.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'top_words.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     return df
@@ -234,8 +241,8 @@ def character_analysis(df):
     df['uppercase_count'] = df['text'].str.findall(r'[A-Z]').str.len()
     df['digit_count'] = df['text'].str.findall(r'\d').str.len()
     df['special_char_count'] = df['text'].str.findall(r'[^a-zA-Z0-9\s]').str.len()
-    df['exclamation_count'] = df['text'].str.count('!')
-    df['question_count'] = df['text'].str.count('?')
+    df['exclamation_count'] = df['text'].str.count(r'!')
+    df['question_count'] = df['text'].str.count(r'\?')
     
     print("\n" + "="*50)
     print("Character Statistics by Class:")
@@ -269,12 +276,12 @@ def main():
     df = character_analysis(df)
     
     # Save processed data
-    df.to_csv('../../data/emails_spam_processed.csv', index=False)
+    DATA_PROCESSED.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(DATA_PROCESSED, index=False)
     print("\n" + "="*50)
-    print("EDA Complete! Processed data saved.")
+    print(f"EDA Complete! Processed data saved to {DATA_PROCESSED}")
     print("="*50)
 
 if __name__ == "__main__":
     main()
-
 

@@ -9,14 +9,22 @@ library(tm)
 library(stringr)
 library(RColorBrewer)
 
-# Set working directory (adjust as needed)
-# setwd("path/to/project")
-
-# Create output directory
-dir.create("../../output/figures", recursive = TRUE, showWarnings = FALSE)
+# Multi-candidate path resolution (project root or scripts/r/)
+project_root <- NULL
+for (cand in c(".", file.path("..", ".."), "..")) {
+  if (file.exists(file.path(cand, "data", "emails_spam_clean.csv"))) {
+    project_root <- normalizePath(cand, winslash = "/", mustWork = FALSE)
+    break
+  }
+}
+if (is.null(project_root)) {
+  stop(paste("Cannot find data/emails_spam_clean.csv. CWD:", getwd()))
+}
+setwd(project_root)
+dir.create(file.path("output", "figures"), recursive = TRUE, showWarnings = FALSE)
 
 # Load data
-df <- read.csv("../../data/emails_spam_clean.csv", stringsAsFactors = FALSE)
+df <- read.csv(file.path("data", "emails_spam_clean.csv"), stringsAsFactors = FALSE)
 
 # Basic information
 cat("Dataset Shape:", dim(df), "\n")
@@ -40,7 +48,7 @@ cat("\nSpam Percentage:\n")
 print(prop.table(table(df$spam)) * 100)
 
 # Visualize target distribution
-png("../../output/figures/target_distribution_R.png", width = 1200, height = 600, res = 300)
+png("output/figures/target_distribution_R.png", width = 1200, height = 600, res = 300)
 par(mfrow = c(1, 2))
 
 # Bar plot
@@ -78,7 +86,7 @@ print(df %>%
   ))
 
 # Visualizations
-png("../../output/figures/text_statistics_R.png", width = 1600, height = 1200, res = 300)
+png("output/figures/text_statistics_R.png", width = 1600, height = 1200, res = 300)
 par(mfrow = c(2, 2))
 
 # Text length distribution
@@ -136,7 +144,7 @@ cat("\nTop 20 Ham Words:\n")
 print(top_ham_words)
 
 # Word clouds
-png("../../output/figures/wordclouds_R.png", width = 1600, height = 800, res = 300)
+png("output/figures/wordclouds_R.png", width = 1600, height = 800, res = 300)
 par(mfrow = c(1, 2))
 
 wordcloud(names(spam_word_freq), spam_word_freq, max.words = 100,
@@ -148,7 +156,7 @@ wordcloud(names(ham_word_freq), ham_word_freq, max.words = 100,
 dev.off()
 
 # Top words bar plot
-png("../../output/figures/top_words_R.png", width = 1600, height = 800, res = 300)
+png("output/figures/top_words_R.png", width = 1600, height = 800, res = 300)
 par(mfrow = c(1, 2))
 
 barplot(rev(top_spam_words), horiz = TRUE, las = 1, main = "Top 20 Words in Spam Emails",
@@ -179,7 +187,7 @@ print(df %>%
   ))
 
 # Save processed data
-write.csv(df, "../../data/emails_spam_processed_R.csv", row.names = FALSE)
+write.csv(df, "data/emails_spam_processed_R.csv", row.names = FALSE)
 
 cat("\nEDA Complete! Processed data saved.\n")
 

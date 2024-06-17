@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
+from pathlib import Path
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -15,12 +16,19 @@ warnings.filterwarnings('ignore')
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (12, 6)
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+DATA_PROCESSED = PROJECT_ROOT / 'data' / 'emails_spam_processed.csv'
+DATA_CLEAN = PROJECT_ROOT / 'data' / 'emails_spam_clean.csv'
+FIGURES_DIR = PROJECT_ROOT / 'output' / 'figures'
+FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+
 def load_data():
     """Load processed dataset"""
-    try:
-        df = pd.read_csv('../../data/emails_spam_processed.csv')
-    except:
-        df = pd.read_csv('../../data/emails_spam_clean.csv')
+    if DATA_PROCESSED.exists():
+        df = pd.read_csv(DATA_PROCESSED)
+    else:
+        df = pd.read_csv(DATA_CLEAN)
         df['text_length'] = df['text'].str.len()
         df['word_count'] = df['text'].str.split().str.len()
     return df
@@ -67,7 +75,7 @@ def univariate_analysis(df):
         axes[idx].grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('../../output/figures/univariate_analysis.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'univariate_analysis.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     # Box plots
@@ -81,7 +89,7 @@ def univariate_analysis(df):
         axes[idx].grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('../../output/figures/univariate_boxplots.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'univariate_boxplots.png', dpi=300, bbox_inches='tight')
     plt.close()
 
 def bivariate_analysis(df):
@@ -127,7 +135,7 @@ def bivariate_analysis(df):
         axes[idx].grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('../../output/figures/bivariate_scatter.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'bivariate_scatter.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     # Violin plots
@@ -144,7 +152,7 @@ def bivariate_analysis(df):
         axes[idx].grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('../../output/figures/bivariate_violin.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'bivariate_violin.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     # Correlation with target
@@ -173,7 +181,7 @@ def multivariate_analysis(df):
                 square=True, linewidths=1, cbar_kws={"shrink": 0.8}, fmt='.3f')
     plt.title('Correlation Matrix - Multivariate Analysis')
     plt.tight_layout()
-    plt.savefig('../../output/figures/multivariate_correlation.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'multivariate_correlation.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     # Pair plots
@@ -183,13 +191,13 @@ def multivariate_analysis(df):
     
     pair_plot_cols = numeric_cols[:4] + ['spam']
     pair_df = sample_df[pair_plot_cols].copy()
-    pair_df['spam'] = pair_df['spam'].astype(str)
+    pair_df['spam'] = pair_df['spam'].astype(int).astype(str)
     
     # Create pair plot
     g = sns.pairplot(pair_df, hue='spam', diag_kind='kde', 
                      palette={'0': 'skyblue', '1': 'salmon'})
     g.fig.suptitle('Pairwise Relationships - Multivariate Analysis', y=1.02)
-    plt.savefig('../../output/figures/multivariate_pairplot.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'multivariate_pairplot.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     # Principal Component Analysis (PCA) visualization
@@ -219,7 +227,7 @@ def multivariate_analysis(df):
     plt.legend()
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig('../../output/figures/multivariate_pca.png', dpi=300, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'multivariate_pca.png', dpi=300, bbox_inches='tight')
     plt.close()
     
     print(f"   Explained variance by PC1: {pca.explained_variance_ratio_[0]:.2%}")
@@ -232,7 +240,7 @@ def multivariate_analysis(df):
         # Create interaction term
         df['text_length_word_count_interaction'] = df['text_length'] * df['word_count']
         interaction_corr = df['text_length_word_count_interaction'].corr(df['spam'])
-        print(f"   Text Length × Word Count interaction - Spam correlation: {interaction_corr:.4f}")
+        print(f"   Text Length x Word Count interaction - Spam correlation: {interaction_corr:.4f}")
 
 def main():
     """Main function"""
