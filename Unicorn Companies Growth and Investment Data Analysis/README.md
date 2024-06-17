@@ -243,3 +243,27 @@ For questions or suggestions, please open an issue in the repository.
 *Enhanced with unicorn company analytics including funding trends and valuation modeling*
 
 **Last Updated**: June 2024
+
+## Visualizations
+
+Showcase figures are stored in `docs/images/`:
+
+### Valuation distribution
+
+![Valuation distribution](docs/images/valuation_distribution.png)
+
+### Funding trend by year
+
+![Funding trend by year](docs/images/funding_trend_by_year.png)
+
+### Average raised by year
+
+![Average raised by year](docs/images/avg_raised_by_year.png)
+
+### Model comparison
+
+![Model comparison](docs/images/model_comparison_valuation.png)
+
+### Top industries
+
+![Top industries](docs/images/top_industries.png)

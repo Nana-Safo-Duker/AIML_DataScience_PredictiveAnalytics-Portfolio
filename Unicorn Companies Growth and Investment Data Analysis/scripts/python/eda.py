@@ -15,28 +15,48 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
-from datetime import datetime
-import os
+from pathlib import Path
 import sys
 
-# Add parent directory to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-
 warnings.filterwarnings('ignore')
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+
+
+def resolve_path(*parts):
+    """Resolve a path using project root and cwd candidates."""
+    candidates = [
+        PROJECT_ROOT.joinpath(*parts),
+        Path.cwd().joinpath(*parts),
+        Path.cwd().parent.parent.joinpath(*parts),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate.resolve()
+    return PROJECT_ROOT.joinpath(*parts)
+
 
 # Set plotting style
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (12, 6)
 plt.rcParams['font.size'] = 10
 
-# Create results directory if it doesn't exist
-os.makedirs('../../results/plots', exist_ok=True)
-os.makedirs('../../data', exist_ok=True)
+DATA_DIR = resolve_path("data")
+PLOTS_DIR = PROJECT_ROOT / "results" / "plots"
+PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_data(filepath='../../data/Unicorn_Companies.csv'):
+def load_data(filepath=None):
     """Load the dataset"""
     print("Loading dataset...")
+    if filepath is None:
+        filepath = resolve_path("data", "Unicorn_Companies.csv")
+    else:
+        filepath = Path(filepath)
+        if not filepath.exists():
+            filepath = resolve_path("data", Path(filepath).name)
     df = pd.read_csv(filepath)
     print(f"Dataset Shape: {df.shape}")
     return df
@@ -45,10 +65,10 @@ def load_data(filepath='../../data/Unicorn_Companies.csv'):
 def clean_data(df):
     """Clean and preprocess the data"""
     print("\nCleaning data...")
-    
+
     # Fix column name typo
     df.rename(columns={'Select Inverstors': 'Select Investors'}, inplace=True)
-    
+
     # Clean Valuation column
     def clean_valuation(val):
         if pd.isna(val):
@@ -56,18 +76,18 @@ def clean_data(df):
         val_str = str(val).replace('$', '').strip()
         try:
             return float(val_str)
-        except:
+        except Exception:
             return np.nan
-    
+
     df['Valuation_B'] = df['Valuation ($B)'].apply(clean_valuation)
-    
+
     # Clean Total Raised column
     def clean_total_raised(val):
         if pd.isna(val) or val == 'None':
             return np.nan
         val_str = str(val)
         val_str = val_str.replace('$', '').strip()
-        
+
         if 'B' in val_str.upper():
             return float(val_str.upper().replace('B', '').strip())
         elif 'M' in val_str.upper():
@@ -77,29 +97,29 @@ def clean_data(df):
         else:
             try:
                 return float(val_str) / 1000000000
-            except:
+            except Exception:
                 return np.nan
-    
+
     df['Total_Raised_B'] = df['Total Raised'].apply(clean_total_raised)
-    
+
     # Convert Date Joined to datetime
     df['Date_Joined'] = pd.to_datetime(df['Date Joined'], errors='coerce')
     df['Year_Joined'] = df['Date_Joined'].dt.year
-    
+
     # Clean Founded Year
     def clean_founded_year(val):
         if pd.isna(val) or val == 'None':
             return np.nan
         try:
             return int(float(val))
-        except:
+        except Exception:
             return np.nan
-    
+
     df['Founded_Year'] = df['Founded Year'].apply(clean_founded_year)
-    
+
     # Calculate years to unicorn status
     df['Years_to_Unicorn'] = df['Year_Joined'] - df['Founded_Year']
-    
+
     print("Data cleaning completed!")
     return df
 
@@ -109,23 +129,23 @@ def analyze_missing_values(df):
     print("\n" + "="*50)
     print("Missing Value Analysis")
     print("="*50)
-    
+
     missing_values = df.isnull().sum()
     missing_percent = (missing_values / len(df)) * 100
-    
+
     missing_df = pd.DataFrame({
         'Column': missing_values.index,
         'Missing Count': missing_values.values,
         'Missing Percentage': missing_percent.values
     })
-    
+
     missing_df = missing_df[missing_df['Missing Count'] > 0].sort_values('Missing Count', ascending=False)
-    
+
     if len(missing_df) > 0:
         print(missing_df.to_string(index=False))
     else:
         print("No missing values found!")
-    
+
     return missing_df
 
 
@@ -134,19 +154,19 @@ def basic_statistics(df):
     print("\n" + "="*50)
     print("Basic Statistical Summary")
     print("="*50)
-    
-    numeric_cols = ['Valuation_B', 'Total_Raised_B', 'Investors Count', 'Deal Terms', 
+
+    numeric_cols = ['Valuation_B', 'Total_Raised_B', 'Investors Count', 'Deal Terms',
                     'Portfolio Exits', 'Founded_Year', 'Year_Joined', 'Years_to_Unicorn']
-    
+
     print("\nNumerical Columns Summary:")
     print(df[numeric_cols].describe())
-    
+
     print("\n" + "="*50)
     print("Categorical Columns Summary")
     print("="*50)
-    
+
     categorical_cols = ['Country', 'City', 'Industry', 'Financial Stage']
-    
+
     for col in categorical_cols:
         print(f"\n{col}:")
         print(df[col].value_counts().head(10))
@@ -157,7 +177,7 @@ def create_visualizations(df):
     print("\n" + "="*50)
     print("Creating Visualizations")
     print("="*50)
-    
+
     # Distribution of Valuations
     plt.figure(figsize=(12, 6))
     plt.subplot(1, 2, 1)
@@ -165,17 +185,17 @@ def create_visualizations(df):
     plt.title('Distribution of Company Valuations')
     plt.xlabel('Valuation ($B)')
     plt.ylabel('Frequency')
-    
+
     plt.subplot(1, 2, 2)
     df['Valuation_B'].plot(kind='box')
     plt.title('Box Plot of Company Valuations')
     plt.ylabel('Valuation ($B)')
-    
+
     plt.tight_layout()
-    plt.savefig('../../results/plots/valuation_distribution.png', dpi=300, bbox_inches='tight')
+    plt.savefig(PLOTS_DIR / 'valuation_distribution.png', dpi=300, bbox_inches='tight')
     plt.close()
     print("Saved: valuation_distribution.png")
-    
+
     # Top 10 Countries
     plt.figure(figsize=(12, 6))
     top_countries = df['Country'].value_counts().head(10)
@@ -184,10 +204,10 @@ def create_visualizations(df):
     plt.xlabel('Number of Unicorns')
     plt.ylabel('Country')
     plt.tight_layout()
-    plt.savefig('../../results/plots/top_countries.png', dpi=300, bbox_inches='tight')
+    plt.savefig(PLOTS_DIR / 'top_countries.png', dpi=300, bbox_inches='tight')
     plt.close()
     print("Saved: top_countries.png")
-    
+
     # Top Industries
     plt.figure(figsize=(12, 8))
     top_industries = df['Industry'].value_counts().head(15)
@@ -196,10 +216,10 @@ def create_visualizations(df):
     plt.xlabel('Number of Unicorns')
     plt.ylabel('Industry')
     plt.tight_layout()
-    plt.savefig('../../results/plots/top_industries.png', dpi=300, bbox_inches='tight')
+    plt.savefig(PLOTS_DIR / 'top_industries.png', dpi=300, bbox_inches='tight')
     plt.close()
     print("Saved: top_industries.png")
-    
+
     # Unicorns by Year
     plt.figure(figsize=(14, 6))
     yearly_unicorns = df.groupby('Year_Joined').size()
@@ -209,13 +229,17 @@ def create_visualizations(df):
     plt.ylabel('Number of Unicorns')
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig('../../results/plots/unicorns_by_year.png', dpi=300, bbox_inches='tight')
+    plt.savefig(PLOTS_DIR / 'unicorns_by_year.png', dpi=300, bbox_inches='tight')
     plt.close()
     print("Saved: unicorns_by_year.png")
 
 
-def save_cleaned_data(df, filepath='../../data/Unicorn_Companies_cleaned.csv'):
+def save_cleaned_data(df, filepath=None):
     """Save cleaned dataset"""
+    if filepath is None:
+        filepath = PROJECT_ROOT / "data" / "Unicorn_Companies_cleaned.csv"
+    filepath = Path(filepath)
+    filepath.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(filepath, index=False)
     print(f"\nCleaned dataset saved to {filepath}")
 
@@ -225,32 +249,32 @@ def main():
     print("="*50)
     print("Exploratory Data Analysis: Unicorn Companies")
     print("="*50)
-    
+
     # Load data
     df = load_data()
-    
+
     # Display basic info
     print("\nDataset Info:")
     df.info()
-    
+
     print("\nColumn Names:")
     print(df.columns.tolist())
-    
+
     # Analyze missing values
     analyze_missing_values(df)
-    
+
     # Clean data
     df_cleaned = clean_data(df.copy())
-    
+
     # Basic statistics
     basic_statistics(df_cleaned)
-    
+
     # Create visualizations
     create_visualizations(df_cleaned)
-    
+
     # Save cleaned data
     save_cleaned_data(df_cleaned)
-    
+
     print("\n" + "="*50)
     print("EDA Completed Successfully!")
     print("="*50)
