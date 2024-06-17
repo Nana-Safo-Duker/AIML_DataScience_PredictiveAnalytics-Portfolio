@@ -2,6 +2,17 @@
 
 This repository curates ten end-to-end analytics projects that span marketing, customer intelligence, cybersecurity, NLP, HR analytics, financial crime, energy, classical machine learning education, compensation science, and venture insights. Every project follows the same blueprint—clean, analyze, model, and communicate—so you can jump into any folder and reproduce the workflow with minimal ramp-up.
 
+## Table of Contents
+
+- [About](#about)
+- [Repository Highlights](#repository-highlights)
+- [Project Catalog](#project-catalog)
+- [Project Summaries](#project-summaries)
+- [Getting Started](#getting-started)
+- [Repository Structure](#repository-structure)
+- [Contributing & Support](#contributing--support)
+- [License & Data Ethics](#license--data-ethics)
+
 ## About
 - **Maintainer:** Nana Safo Duker  
 - **Website/Portfolio:** [https://nana-safo-duker.github.io/](https://nana-safo-duker.github.io/)  
