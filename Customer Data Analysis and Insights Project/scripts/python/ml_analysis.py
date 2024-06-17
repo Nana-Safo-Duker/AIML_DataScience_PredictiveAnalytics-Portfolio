@@ -21,10 +21,12 @@ warnings.filterwarnings('ignore')
 sns.set_style('whitegrid')
 plt.rcParams['figure.figsize'] = (14, 8)
 
-# Set paths
-data_path = Path('../../data/Customers.csv')
-results_path = Path('../../results')
-results_path.mkdir(exist_ok=True)
+# Resolve paths relative to this script so both cwd=script dir and cwd=project root work
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+data_path = PROJECT_ROOT / 'data' / 'Customers.csv'
+results_path = PROJECT_ROOT / 'results'
+results_path.mkdir(parents=True, exist_ok=True)
 
 # Load data
 df = pd.read_csv(data_path)
@@ -263,7 +265,7 @@ def main():
     
     # Save results
     df_clustered.to_csv(results_path / 'clustered_customers.csv', index=False)
-    print(f"\n✓ Clustered data saved to {results_path / 'clustered_customers.csv'}")
+    print(f"\n[OK] Clustered data saved to {results_path / 'clustered_customers.csv'}")
     
     print("\n" + "=" * 50)
     print("ML ANALYSIS SUMMARY")

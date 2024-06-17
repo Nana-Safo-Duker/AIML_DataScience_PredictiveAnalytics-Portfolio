@@ -306,3 +306,26 @@ This script will check:
 ---
 *Enhanced with comprehensive customer segmentation and behavioral analytics workflows*
 
+## Visualizations
+
+Showcase figures are stored in `docs/images/`:
+
+### Customers by country
+
+![Customers by country](docs/images/customers_by_country.png)
+
+### Customers by city
+
+![Customers by city](docs/images/customers_by_city.png)
+
+### Customer segments (PCA)
+
+![Customer segments (PCA)](docs/images/customer_segments_pca.png)
+
+### Cluster sizes
+
+![Cluster sizes](docs/images/cluster_sizes.png)
+
+### Dataset footprint
+
+![Dataset footprint](docs/images/dataset_footprint.png)

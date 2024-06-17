@@ -7,9 +7,20 @@ library(ggplot2)
 library(dplyr)
 library(VIM)
 
-# Set paths
-data_path <- "../../data/Customers.csv"
-results_path <- "../../results"
+# Multi-candidate path resolution (project root or scripts/r/)
+data_path <- file.path("data", "Customers.csv")
+results_path <- "results"
+if (!file.exists(data_path)) {
+  data_path <- file.path("..", "..", "data", "Customers.csv")
+  results_path <- file.path("..", "..", "results")
+}
+if (!file.exists(data_path)) {
+  data_path <- file.path("..", "data", "Customers.csv")
+  results_path <- file.path("..", "results")
+}
+if (!file.exists(data_path)) {
+  stop(paste("Cannot find Customers.csv. Current working directory:", getwd()))
+}
 
 # Create results directory if it doesn't exist
 if (!dir.exists(results_path)) {

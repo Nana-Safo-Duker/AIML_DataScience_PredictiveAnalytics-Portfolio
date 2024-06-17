@@ -16,10 +16,12 @@ warnings.filterwarnings('ignore')
 sns.set_style('whitegrid')
 plt.rcParams['figure.figsize'] = (12, 6)
 
-# Set paths
-data_path = Path('../../data/Customers.csv')
-results_path = Path('../../results')
-results_path.mkdir(exist_ok=True)
+# Resolve paths relative to this script so both cwd=script dir and cwd=project root work
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+data_path = PROJECT_ROOT / 'data' / 'Customers.csv'
+results_path = PROJECT_ROOT / 'results'
+results_path.mkdir(parents=True, exist_ok=True)
 
 def load_data():
     """Load the dataset"""
@@ -52,7 +54,7 @@ def missing_values_analysis(df):
     print("\n=== Missing Values Analysis ===")
     result_df = missing_df[missing_df['Missing Count'] > 0]
     if len(result_df) == 0:
-        print("✓ No missing values found in the dataset!")
+        print("[OK] No missing values found in the dataset!")
     else:
         print(result_df)
     return missing_df
@@ -66,7 +68,7 @@ def duplicate_analysis(df):
         print("\nDuplicate records:")
         print(df[df.duplicated()])
     else:
-        print("✓ No duplicate records found!")
+        print("[OK] No duplicate records found!")
     return duplicate_count
 
 def summary_statistics(df):
@@ -119,7 +121,7 @@ def visualize_distributions(df):
     plt.savefig(results_path / 'city_distribution.png', dpi=300, bbox_inches='tight')
     plt.close()
     
-    print("\n✓ Visualizations saved to results/ directory")
+    print("\n[OK] Visualizations saved to results/ directory")
 
 def data_quality_checks(df):
     """Perform data quality checks"""
@@ -137,7 +139,7 @@ def data_quality_checks(df):
     print(f"Unique Customer IDs: {df['CustomerID'].nunique()}")
     print(f"Total Records: {len(df)}")
     if df['CustomerID'].nunique() == len(df):
-        print("✓ All Customer IDs are unique")
+        print("[OK] All Customer IDs are unique")
     else:
         print("⚠ Warning: Duplicate Customer IDs found")
 

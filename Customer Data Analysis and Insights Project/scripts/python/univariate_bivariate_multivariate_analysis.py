@@ -19,10 +19,12 @@ warnings.filterwarnings('ignore')
 sns.set_style('whitegrid')
 plt.rcParams['figure.figsize'] = (14, 8)
 
-# Set paths
-data_path = Path('../../data/Customers.csv')
-results_path = Path('../../results')
-results_path.mkdir(exist_ok=True)
+# Resolve paths relative to this script so both cwd=script dir and cwd=project root work
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+data_path = PROJECT_ROOT / 'data' / 'Customers.csv'
+results_path = PROJECT_ROOT / 'results'
+results_path.mkdir(parents=True, exist_ok=True)
 
 # Load data
 df = pd.read_csv(data_path)
@@ -99,7 +101,7 @@ def univariate_analysis():
         plt.savefig(results_path / f'univariate_{col}.png', dpi=300, bbox_inches='tight')
         plt.close()
     
-    print("\n✓ Univariate analysis visualizations saved")
+    print("\n[OK] Univariate analysis visualizations saved")
 
 def bivariate_analysis():
     """Perform bivariate analysis"""
@@ -159,7 +161,7 @@ def bivariate_analysis():
     else:
         print(f"Result: No significant association (p >= {alpha})")
     
-    print("\n✓ Bivariate analysis visualizations saved")
+    print("\n[OK] Bivariate analysis visualizations saved")
 
 def multivariate_analysis():
     """Perform multivariate analysis"""
@@ -242,7 +244,7 @@ def multivariate_analysis():
         plt.savefig(results_path / 'multivariate_3d_scatter.png', dpi=300, bbox_inches='tight')
         plt.close()
     
-    print("\n✓ Multivariate analysis visualizations saved")
+    print("\n[OK] Multivariate analysis visualizations saved")
 
 def main():
     """Main function"""

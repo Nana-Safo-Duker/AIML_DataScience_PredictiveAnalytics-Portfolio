@@ -18,10 +18,12 @@ warnings.filterwarnings('ignore')
 sns.set_style('whitegrid')
 plt.rcParams['figure.figsize'] = (12, 6)
 
-# Set paths
-data_path = Path('../../data/Customers.csv')
-results_path = Path('../../results')
-results_path.mkdir(exist_ok=True)
+# Resolve paths relative to this script so both cwd=script dir and cwd=project root work
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+data_path = PROJECT_ROOT / 'data' / 'Customers.csv'
+results_path = PROJECT_ROOT / 'results'
+results_path.mkdir(parents=True, exist_ok=True)
 
 # Load data
 df = pd.read_csv(data_path)
@@ -180,7 +182,7 @@ def exploratory_statistics():
     })
     print(measures)
     
-    print("\n✓ Statistical analysis visualizations saved to results/ directory")
+    print("\n[OK] Statistical analysis visualizations saved to results/ directory")
 
 def main():
     """Main function"""

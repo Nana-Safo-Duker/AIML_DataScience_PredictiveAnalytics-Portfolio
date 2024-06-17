@@ -49,10 +49,11 @@ ENV/
 # data/*.xlsx
 # data/*.json
 
-# Results
+# Results (runtime dumps; keep showcase PNGs under docs/images/)
 results/*.png
 results/*.jpg
 results/*.pdf
+results/*.csv
 !results/.gitkeep
 
 # Logs
