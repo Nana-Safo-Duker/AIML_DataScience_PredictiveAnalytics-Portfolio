@@ -1,0 +1,41 @@
+# R Dependencies for Iris Dataset Analysis
+# Install using: install.packages(c("package_name"))
+
+# Data manipulation and analysis
+dplyr
+tidyr
+readr
+
+# Visualization
+ggplot2
+gridExtra
+corrplot
+ggcorrplot
+RColorBrewer
+
+# Statistical analysis
+stats
+car
+psych
+DescTools
+
+# Machine Learning
+caret
+randomForest
+e1071
+nnet
+rpart
+xgboost
+
+# Reporting
+knitr
+rmarkdown
+
+# Additional utilities
+reshape2
+VIM
+
+
+
+
+
