@@ -11,12 +11,28 @@ from pathlib import Path
 
 warnings.filterwarnings('ignore')
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent.parent
+
+
+def resolve_path(*parts):
+    """Resolve path via project root and cwd candidates."""
+    candidates = [
+        PROJECT_ROOT.joinpath(*parts),
+        Path.cwd().joinpath(*parts),
+        Path.cwd().parent.parent.joinpath(*parts),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate.resolve()
+    return PROJECT_ROOT.joinpath(*parts)
+
 # Set style
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (12, 8)
 
 # Load data
-data_path = Path(__file__).parent.parent.parent / 'data' / 'Iris.csv'
+data_path = resolve_path('data', 'Iris.csv')
 df = pd.read_csv(data_path)
 features = ['sepal.length', 'sepal.width', 'petal.length', 'petal.width']
 
@@ -25,10 +41,10 @@ print("UNIVARIATE ANALYSIS - IRIS DATASET")
 print("=" * 80)
 
 # Create results directory
-results_dir = Path(__file__).parent.parent.parent / 'results'
-results_dir.mkdir(exist_ok=True)
+results_dir = PROJECT_ROOT / 'results'
+results_dir.mkdir(parents=True, exist_ok=True)
 figures_dir = results_dir / 'figures'
-figures_dir.mkdir(exist_ok=True)
+figures_dir.mkdir(parents=True, exist_ok=True)
 
 # 1. Descriptive Statistics
 print("\n1. DESCRIPTIVE STATISTICS")

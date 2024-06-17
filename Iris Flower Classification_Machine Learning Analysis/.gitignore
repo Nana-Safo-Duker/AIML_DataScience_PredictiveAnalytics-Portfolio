@@ -64,10 +64,12 @@ env/
 # data/*.csv
 # !data/Iris.csv
 
-# Results
+# Results (runtime dumps — keep untracked)
 results/*.png
 results/*.jpg
 results/*.pdf
+results/figures/
+results/figures/**
 !results/.gitkeep
 
 # OS

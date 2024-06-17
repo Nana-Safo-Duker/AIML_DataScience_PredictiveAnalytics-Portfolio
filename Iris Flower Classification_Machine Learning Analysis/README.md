@@ -314,3 +314,27 @@ For questions or suggestions, please open an issue on the repository.
 *Enhanced with Iris classification ML workflow including visualizations and model comparisons*
 
 **Last Updated**: June 2024
+
+## Visualizations
+
+Showcase figures are stored in `docs/images/`:
+
+### Species pairplot
+
+![Species pairplot](docs/images/species_pairplot.png)
+
+### Confusion matrix (RF)
+
+![Confusion matrix (RF)](docs/images/confusion_matrix_rf.png)
+
+### Model comparison
+
+![Model comparison](docs/images/model_comparison_accuracy.png)
+
+### Feature boxplots by species
+
+![Feature boxplots by species](docs/images/feature_boxplots_by_species.png)
+
+### Feature correlation
+
+![Feature correlation](docs/images/feature_correlation.png)
