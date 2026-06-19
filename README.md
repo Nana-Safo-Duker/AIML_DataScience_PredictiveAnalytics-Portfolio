@@ -8,6 +8,7 @@ This repository curates ten end-to-end analytics projects that span marketing, c
 - [Repository Highlights](#repository-highlights)
 - [Project Catalog](#project-catalog)
 - [Project Summaries](#project-summaries)
+- [Visualization Gallery](#visualization-gallery)
 - [Getting Started](#getting-started)
 - [Repository Structure](#repository-structure)
 - [Contributing & Support](#contributing--support)
@@ -95,12 +96,101 @@ This repository curates ten end-to-end analytics projects that span marketing, c
 - **Highlights:** Exploratory docs, Jupyter & R Markdown notebooks, predictive models (valuation regression, stage classification), investor insights.
 - **Deliverables:** Plot library, project structure documentation, modeling scripts.
 
+## Visualization Gallery
+
+Each project ships showcase figures under `docs/images/` (committed for GitHub rendering). Full run outputs also land in that project's `results/` folder where applicable.
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 1. Consumer Purchase Prediction
+
+[![Consumer purchase ROC](Consumer%20Purchase%20Prediction%20using%20Machine%20Learning/docs/images/roc_curves.png)](Consumer%20Purchase%20Prediction%20using%20Machine%20Learning/README.md#visualizations)
+
+</td>
+<td width="50%" valign="top">
+
+### 2. Customer Data Analysis
+
+[![Customer segments PCA](Customer%20Data%20Analysis%20and%20Insights%20Project/docs/images/customer_segments_pca.png)](Customer%20Data%20Analysis%20and%20Insights%20Project/README.md#visualizations)
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 3. Cybersecurity Threat Detection
+
+[![Attack categories](Cybersecurity%20Threat%20Detection%20and%20Attack%20Pattern%20Analysis/docs/images/attack_categories.png)](Cybersecurity%20Threat%20Detection%20and%20Attack%20Pattern%20Analysis/README.md#visualizations)
+
+</td>
+<td width="50%" valign="top">
+
+### 4. Email Spam Detection
+
+[![Spam model comparison](Email%20Spam%20Detection_Data%20Science%20Project/docs/images/model_comparison.png)](Email%20Spam%20Detection_Data%20Science%20Project/README.md#visualizations)
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 5. Employee Performance & Retention
+
+[![Salary distribution](Employee%20Performance%20and%20Retention%20Data%20Analysis/docs/images/salary_distribution.png)](Employee%20Performance%20and%20Retention%20Data%20Analysis/README.md#visualizations)
+
+</td>
+<td width="50%" valign="top">
+
+### 6. Financial Fraud Detection
+
+[![Fraud model comparison](Financial%20Fraud%20Detection%20using%20Predictive%20Analytics/docs/images/model_comparison.png)](Financial%20Fraud%20Detection%20using%20Predictive%20Analytics/README.md#visualizations)
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 7. Fuel Consumption & Efficiency
+
+[![Fuel model comparison](Fuel%20Consumption%20and%20Efficiency%20Analysis%20Project/docs/images/model_comparison_fuel.png)](Fuel%20Consumption%20and%20Efficiency%20Analysis%20Project/README.md#visualizations)
+
+</td>
+<td width="50%" valign="top">
+
+### 8. Iris Flower Classification
+
+[![Iris species pairplot](Iris%20Flower%20Classification_Machine%20Learning%20Analysis/docs/images/species_pairplot.png)](Iris%20Flower%20Classification_Machine%20Learning%20Analysis/README.md#visualizations)
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 9. Salary Prediction
+
+[![Polynomial regression curve](Salary%20Prediction_Data%20Science%20and%20Predictive%20Modeling/docs/images/polynomial_regression_curve.png)](Salary%20Prediction_Data%20Science%20and%20Predictive%20Modeling/README.md#visualizations)
+
+</td>
+<td width="50%" valign="top">
+
+### 10. Unicorn Companies Analytics
+
+[![Unicorn funding trend](Unicorn%20Companies%20Growth%20and%20Investment%20Data%20Analysis/docs/images/funding_trend_by_year.png)](Unicorn%20Companies%20Growth%20and%20Investment%20Data%20Analysis/README.md#visualizations)
+
+</td>
+</tr>
+</table>
+
+Open any project README for the full set of figures (EDA panels, confusion matrices, feature importance, model comparisons, and more).
+
 ## Getting Started
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Nana-Safo-Duker/Data-Science-Predictive-Analytics.git
-   cd Data-Science-Predictive-Analytics
+   git clone https://github.com/Nana-Safo-Duker/AIML_DataScience_PredictiveAnalytics-Portfolio.git
+   cd AIML_DataScience_PredictiveAnalytics-Portfolio
    ```
 2. **Pick a project folder** and review its local `README.md` (or documentation directory) for project-specific setup.
 3. **Create an environment**
@@ -118,18 +208,25 @@ This repository curates ten end-to-end analytics projects that span marketing, c
 ## Repository Structure
 
 ```
-├── <project-name>/
-│   ├── data/                 # Raw or processed datasets (kept lightweight)
-│   ├── docs/                 # Project summaries, analysis guides, compliance notes
-│   ├── notebooks/
-│   │   ├── python/           # Ordered .ipynb files
-│   │   └── r/                # Mirrored R notebooks/Rmd files
-│   ├── scripts/
-│   │   ├── python/           # CLI-friendly analysis scripts
-│   │   └── r/                # R equivalents
-│   ├── results/              # Figures, tables, model artifacts
-│   └── requirements*/        # Dependency manifests (where applicable)
-└── README.md                 # You are here
+AIML_DataScience_PredictiveAnalytics-Portfolio/
+├── Consumer Purchase Prediction using Machine Learning/
+├── Customer Data Analysis and Insights Project/
+├── Cybersecurity Threat Detection and Attack Pattern Analysis/
+├── Email Spam Detection_Data Science Project/
+├── Employee Performance and Retention Data Analysis/
+├── Financial Fraud Detection using Predictive Analytics/
+├── Fuel Consumption and Efficiency Analysis Project/
+├── Iris Flower Classification_Machine Learning Analysis/
+├── Salary Prediction_Data Science and Predictive Modeling/
+├── Unicorn Companies Growth and Investment Data Analysis/
+│
+└── (each project typically contains)
+    ├── data/                 # Raw or processed datasets
+    ├── docs/images/          # Showcase figures for README rendering
+    ├── notebooks/python/ & notebooks/r/
+    ├── scripts/python/ & scripts/r/
+    ├── results/              # Figures, tables, model artifacts
+    └── README.md
 ```
 
 ## Contributing & Support
@@ -145,4 +242,4 @@ This repository curates ten end-to-end analytics projects that span marketing, c
 
 Curated with ❤️ to accelerate real-world applied analytics projects. Happy exploring!
 
-**Last Updated**: June 2024
+**Last Updated**: July 2026
